@@ -20,10 +20,10 @@
 /**
  * Brief : Re-maps a number from one range to another range.
  * Param : 	value: the number to map.
- * 		in_min - the lower bound of the value’s current range.
- * 		in_max - the upper bound of the value’s current range.
- * 		out_min - the lower bound of the value’s target range.
- * 		out_max - the upper bound of the value’s target range.
+ * 		in_min : the lower bound of the value current range.
+ * 		in_max : the upper bound of the value current range.
+ * 		out_min : the lower bound of the value target range.
+ * 		out_max : the upper bound of the value target range.
  * RetVal : (float) The mapped value.
  */
 float map(long x, long in_min, long in_max, long out_min, long out_max)
