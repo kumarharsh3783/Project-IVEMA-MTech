@@ -28,8 +28,10 @@
  */
 float map(long x, long in_min, long in_max, long out_min, long out_max)
 {
-	float mapped = 0.0;
-	mapped = ((float)((x-in_min)*(out_max-out_min)/(float)(in_max-in_min)) + out_min);
+	float mapped = 0.0, slope = 0.0;
+	slope = (float)(out_max-out_min)/(in_max-in_min);
+	mapped = (float)(x-in_min)*slope;
+	mapped += out_min;
 	return mapped;
 }
 
