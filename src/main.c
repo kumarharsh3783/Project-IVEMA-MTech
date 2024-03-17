@@ -23,19 +23,22 @@ int main(void)
 {
 	systemClockInit();					/* System Clock Frequency : 72 MHz */
 	gpioInit();							/* All the GPIOs required for the project is initialized here */
-	uartInit();							/* Initialize USART1: RFID and USART2: GPRS/GPS */
-	timerInit();						/* Initialize TIM4 with Interrupt feature enabled */
+/*
+	uartInit();							 Initialize USART1: RFID and USART2: GPRS/GPS
+	timerInit();						 Initialize TIM4 with Interrupt feature enabled
+*/
 	lcdInit();							/* Initialize 16*2 LCD */
-	uart1InterruptRxEnable();			/* Enable Receive Interrupt Enable for UART1 */
-	USART_Cmd(USART1, ENABLE); 			/*Enable USART1 - RFID*/
-	USART_Cmd(USART2, ENABLE); 			/*Enable USART2 - SIM808*/
+/*
+	uart1InterruptRxEnable();			 Enable Receive Interrupt Enable for UART1
+	USART_Cmd(USART1, ENABLE); 			Enable USART1 - RFID
+	USART_Cmd(USART2, ENABLE); 			Enable USART2 - SIM808
+*/
 
-	/* Configure I2C1 for the EEPROM */
+/*
+	 Configure I2C1 for the EEPROM
 	i2cInit();
-	i2cEnable();						/* Enable i2c1 */
-
-	page_addr_write = 0;				/* Start address of EEPROM*/
-	page_addr_read = 0;					/* Default values */
+	i2cEnable();						 Enable i2c1
+*/
 
 	/* Display Welcome Message */
 	lcd_send_string("--------------------");
@@ -57,28 +60,7 @@ int main(void)
 
 	while(1)							/* infinite loop */
 	{
-		/* Clear = 1 will clear lcd and display service name after 5 seconds of msg display */
-		if(clear == 1)
-		{
-			clear = 0;
-			clearLcd();
-			lcdCursorSet(1,4);					/* Change cursor to line 1 */
-			lcd_send_string("Savy Electric");
-			lcdCursorSet(2,2);					/* Change cursor to line 2 */
-			lcd_send_string("Vehicle Services");
-			lcd_msDelay(1000);
-		}
-		/* Clear = 2 will clear lcd and display connection error msg immediately */
-		else if(clear == 2)
-		{
-			clear = 1;
-			clearLcd();
-			lcdCursorSet(1,3);					/* Change cursor to line 1 */
-			lcd_send_string("GPRS Failure !");
-			lcdCursorSet(2,2);					/* Change cursor to line 2 */
-			lcd_send_string("Please Try Again");
-			lcd_msDelay(3000);
-		}
+
 	}
 }
 
