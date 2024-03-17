@@ -45,7 +45,7 @@
 /*********************************************************************
  * Function Declarations
  *********************************************************************/
-float map(long x, long in_min, long in_max, long out_min, long_out_max);
+float map(long x, long in_min, long in_max, long out_min, long out_max);
 
 void adcInit(unsigned char);
 void adcPeripheralEnable(unsigned char);

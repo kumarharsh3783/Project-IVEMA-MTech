@@ -29,13 +29,13 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: smartNfcMeteringSystem.elf
+all: IVEMA.elf
 
 # Tool invocations
-smartNfcMeteringSystem.elf: $(OBJS) $(USER_OBJS) C:\Users\Kumar\ Harsh\Documents\_Documents\NI_TrainingDocuments\Office\OpenSTM_Projects\smartNfcMeteringSystem/LinkerScript.ld
+IVEMA.elf: $(OBJS) $(USER_OBJS) C:\Users\Kumar\ Harsh\Documents\Sandbox\Project-IVEMA-MTech/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"C:/Users/Kumar Harsh/Documents/_Documents/NI_TrainingDocuments/Office/OpenSTM_Projects/smartNfcMeteringSystem/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "smartNfcMeteringSystem.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"C:/Users/Kumar Harsh/Documents/Sandbox/Project-IVEMA-MTech/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "IVEMA.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
@@ -47,8 +47,8 @@ clean:
 
 post-build:
 	-@echo 'Generating binary and Printing size information:'
-	arm-none-eabi-objcopy -O binary "smartNfcMeteringSystem.elf" "smartNfcMeteringSystem.bin"
-	arm-none-eabi-size "smartNfcMeteringSystem.elf"
+	arm-none-eabi-objcopy -O binary "IVEMA.elf" "IVEMA.bin"
+	arm-none-eabi-size "IVEMA.elf"
 	-@echo ' '
 
 .PHONY: all clean dependents

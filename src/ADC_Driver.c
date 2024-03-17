@@ -9,7 +9,6 @@
  * Includes
  *********************************************************************/
 #include "ADC_Driver.h"
-#
 
 /*********************************************************************
  * Variables Declarations & Definitions
@@ -93,7 +92,7 @@ void adcPeripheralEnable(unsigned char adcModule)
 
 			break;
 		default:
-			/* Nothing */
+			/* Nothing */;
 	}
 }
 
@@ -154,7 +153,7 @@ void adcPeripheralDisable(unsigned char adcModule)
 			break;
 
 		default:
-			/* Nothing */
+			/* Nothing */;
 	}
 }
 
@@ -208,7 +207,7 @@ unsigned int adcStartConversion(unsigned char adcModule)
 			break;
 
 		default:
-			/* Nothing */
+			/* Nothing */;
 	}
 	return adcVal;
 }

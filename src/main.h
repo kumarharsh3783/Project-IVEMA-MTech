@@ -12,8 +12,6 @@
  * Include files
  */
 #include "stm32f10x.h"
-#include "uart.h"
-#include "timer.h"
 #include "lcd.h"
 #include "external.h"
 
