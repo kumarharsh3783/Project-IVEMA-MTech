@@ -13,6 +13,7 @@
  */
 #include "stm32f10x.h"
 #include "lcd.h"
+#include "ADC_Driver.h"
 #include "external.h"
 
 /**

@@ -24,12 +24,13 @@ int main(void)
 	systemClockInit();					/* System Clock Frequency : 72 MHz */
 	gpioInit();							/* All the GPIOs required for the project is initialized here */
 /*
-	uartInit();							 Initialize USART1: RFID and USART2: GPRS/GPS
-	timerInit();						 Initialize TIM4 with Interrupt feature enabled
+	uartInit();							 Initialise USART1: RFID and USART2: GPRS/GPS
+	timerInit();						 Initialise TIM4 with Interrupt feature enabled
 */
-	lcdInit();							/* Initialize 16*2 LCD */
+	lcdInit();							/* Initialise 16*2 LCD */
+	adcInit(adc_mod1);					/* Initialise ADC1 Module */
 /*
-	uart1InterruptRxEnable();			 Enable Receive Interrupt Enable for UART1
+	uart1InterruptRxEnable();			Enable Receive Interrupt Enable for UART1
 	USART_Cmd(USART1, ENABLE); 			Enable USART1 - RFID
 	USART_Cmd(USART2, ENABLE); 			Enable USART2 - SIM808
 */
@@ -99,17 +100,21 @@ void systemClockInit()
  */
 void gpioInit()
 {
-	/* Clock to GPIO Peripherals */
+	/* Clock to GPIO Peripherals - Port A, B, C */
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN;	/* Enable clock to GPIO Port A for UARTs and GPIO B LCD*/
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;							/* Enable clock to GPIO Port C for LED indicator */
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;							/* Alternate Function IO clock enabled */
 
 	/*<--------------USART Clock/GPIO Configuration------------->*/
-	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				/* TX pin PA9 configured as output @50MHz in alternate function push pull */
-	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							/* RX pin PA10 configured as input in floating input mode */
-	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				/* TX pin PA2 configured as output @50MHz in alternate function push pull */
-	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							/* RX pin PA3 configured as input in floating input mode */
+/*
+	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				 TX pin PA9 configured as output @50MHz in alternate function push pull
+	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							 RX pin PA10 configured as input in floating input mode
+	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				 TX pin PA2 configured as output @50MHz in alternate function push pull
+	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							 RX pin PA3 configured as input in floating input mode
+*/
 
 	/*<------------------LCD GPIO Configuration----------------->*/
+	/* [PB15,PB14,PB13,PB12] <=> [DB7,DB6,DB5,DB4] are configured */
 	GPIOB->CRH |= GPIO_CRH_MODE12_0;							/* GPIO configured as Output mode @ 10 MHz */
 	GPIOB->CRH &= ~(GPIO_CRH_CNF12_0);							/* and General Purpose PUSH-PULL : DB4 */
 	GPIOB->CRH |= GPIO_CRH_MODE13_0;							/* GPIO configured as Output mode @ 10 MHz */
@@ -127,8 +132,16 @@ void gpioInit()
 	GPIOA->CRL &= ~(GPIO_CRL_CNF1);								/* and General Purpose PUSH-PULL : EN bit */
 
 	/*<------------------LED GPIO Configuration----------------->*/
-	GPIOC->CRH |= GPIO_CRH_MODE13_0;							/* GPIOC Pin13 configured as output @ 10MHz */
-	GPIOC->CRH &= ~(GPIO_CRH_CNF13_0);							/* GPIOC Pin13 configured as General Output Push Pull */
+	/* PA5 configured as Output push pull for LD2 */
+	GPIOA->CRL |= GPIO_CRL_MODE5_0;								/* GPIOC Pin13 configured as output @ 10MHz */
+	GPIOA->CRL &= ~(GPIO_CRL_CNF5);								/* GPIOC Pin13 configured as General Output Push Pull */
+
+	/*<------------------ADC Pins Configuration----------------->*/
+	/* [PC2,PC3] are configured as Analog input pins */
+	GPIOC->CRL &= ~(GPIO_CRL_MODE2);							/* GPIOC Pin2 configured as Input mode */
+	GPIOC->CRL &= ~(GPIO_CRL_CNF2);								/* and configured as Analog mode */
+	GPIOC->CRL &= ~(GPIO_CRL_MODE3);							/* GPIOC Pin3 configured as Input mode */
+	GPIOC->CRL &= ~(GPIO_CRL_CNF3);								/* and configured as Analog mode */
 }
 
 /**
