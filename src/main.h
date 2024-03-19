@@ -13,12 +13,14 @@
  */
 #include "stm32f10x.h"
 #include "lcd.h"
+#include "ADC_Driver.h"
 #include "external.h"
 
 /**
  * User-defined Variables
  */
-
+unsigned int adcVal_mq135;
+unsigned int adcVal_mq7;
 
 /**
  * User-defined Function Declarations
