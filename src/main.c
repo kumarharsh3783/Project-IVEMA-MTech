@@ -58,10 +58,12 @@ int main(void)
 	lcdCursorSet(2,2);					/* Change cursor to line 2 */
 	lcd_send_string("to start trip...");
 
-
 	while(1)							/* infinite loop */
 	{
-
+		adcVal_mq135 = adcStartConversion(adc_mod1);
+		Delay(100);
+		adcVal_mq7 = adcStartConversion(adc_mod1);
+		Delay(100);
 	}
 }
 

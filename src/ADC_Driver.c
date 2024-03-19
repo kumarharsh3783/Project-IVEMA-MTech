@@ -107,10 +107,8 @@ void adcInit(unsigned char adcModule)
 {
 	RCC->CFGR |= CFGR_ADCPRE_DIV6;			/* PCLK2 divided by 6 i.e. 72(max) / 6 = 12 MHz */
 
-	adcPeripheralEnable(adcModule);			/* Enable peripheral clock for specific ADC module */
-
 	/* Regular Channel Sequence */
-	ADC1->SQR1 |= ADC_SQR1_L_1;				/* 0010b: 3 Conversions - PC2, PC3, Temperature Sensor */
+	ADC1->SQR1 |= ADC_SQR1_L_0;				/* 0001b: 2 Conversions - PC2, PC3 */
 
 	/**
 	 * Regular Conversion Sequence -
@@ -119,7 +117,10 @@ void adcInit(unsigned char adcModule)
 	 */
 	ADC1->SQR3 |= (ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_3) | (ADC_SQR3_SQ2_0 | ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_3);
 
-	ADC1->SM
+	/* Sampling time set to 1.17uS for ADC12_IN12 & ADC12_IN13 */
+	ADC1->SMPR1 &= ~(ADC_SMPR1_SMP12 | ADC_SMPR1_SMP13);
+
+	adcPeripheralEnable(adcModule);			/* Enable peripheral clock for specific ADC module */
 }
 
 /**

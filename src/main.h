@@ -19,7 +19,8 @@
 /**
  * User-defined Variables
  */
-
+unsigned int adcVal_mq135;
+unsigned int adcVal_mq7;
 
 /**
  * User-defined Function Declarations
