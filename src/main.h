@@ -19,14 +19,22 @@
 /**
  * User-defined Variables
  */
-uint16_t dmaRcvBuf[2];
+
+typedef enum
+{
+	sysclk_72MHz,
+	sysclk_56MHz
+}sysclk_MHz;
+
+uint16_t dmaRcvBuf[3];
 uint16_t adcVal_mq135;
 uint16_t adcVal_mq7;
+float TemperatureValue;
 
 /**
  * User-defined Function Declarations
  */
-void systemClockInit(void);
+void systemClockInit(sysclk_MHz);
 void gpioInit(void);
 void dmaInit(uint32_t *, uint32_t *, unsigned int);
 void Delay(long int);

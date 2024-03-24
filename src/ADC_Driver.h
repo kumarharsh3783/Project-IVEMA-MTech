@@ -38,6 +38,11 @@
 #define 	CR2_LEFT_ALIGN		(1 << 11)
 #define 	CR2_RIGHT_ALIGN		~(1 << 11)
 
+/* Temperature Conversion Macros */
+#define 	V25					1.43
+#define 	AVG_SLOPE			0.0043
+#define 	VSENSE				(3.3/4095)
+
 /*********************************************************************
  * Variable Declarations
  *********************************************************************/
@@ -57,5 +62,6 @@ void adc1Init(void);
 void adc1ConverterEnable(void);
 void adc1ConverterDisable(void);
 void adc1StartConversion(void);
+float get_Temperature(uint16_t);
 
 #endif /* ADC_DRIVER_H_ */

@@ -103,20 +103,23 @@ void adcCalibration(unsigned char adcModule)
 void adc1Init()
 {
 	RCC->APB2ENR |= RCC_APB2ENR_ADC1EN ; 		/* ADC1 interface clock enable */
-	RCC->CFGR |= RCC_CFGR_ADCPRE_DIV6;			/* PCLK2 divided by 6 i.e. 72(max) / 6 = 12 MHz */
+	RCC->CFGR |= RCC_CFGR_ADCPRE_DIV2;			/* PCLK2 divided by 2 i.e. 28 / 2 = 14 MHz */
 
 	/* Regular Channel Sequence */
-	ADC1->SQR1 |= ADC_SQR1_L_0;					/* 0001b: 2 Conversions - PC2, PC3 */
+	ADC1->SQR1 |= ADC_SQR1_L_1;					/* 0010b: 3 Conversions - PC2, PC3, Temperature Sensor */
 
 	/**
 	 * Regular Conversion Sequence -
 	 * Conversion 1 : PC2 ADCx_IN12 - MQ 135
 	 * Conversion 2 : PC2 ADCx_IN13 - MQ 7
+	 * Conversion 3 : ADCx_IN16 - Internal Temperature Sensor
 	 */
 	ADC1->SQR3 |= (ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_3);
 	ADC1->SQR3 |= (ADC_SQR3_SQ2_0 | ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_3);
+	ADC1->SQR3 |= ADC_SQR3_SQ3_4;
 
-	/* Sampling time set to 1.17uS for ADC12_IN12 & ADC12_IN13 */
+	/* Sampling time set to 1.17uS for ADC12_IN12 & ADC12_IN13 and 17.1uS for temperature sensor */
+	ADC1->SMPR1 |= ADC_SMPR1_SMP16; 			/* 239.5 cycles set for ADC1_IN16 channel */
 
 	/* ADC Conversion to be started with SWSTART in continuous mode */
 	ADC1->CR2 |= ADC_CR2_EXTSEL | ADC_CR2_EXTTRIG | ADC_CR2_CONT;
@@ -126,7 +129,8 @@ void adc1Init()
 	ADC1->CR1 |= ADC_CR1_SCAN;
 
 	/* First ADON High for Powering ON the ADC */
-	adc1ConverterEnable();
+	/* Wake up the temperature sensor from power down mode */
+	ADC1->CR2 |= ADC_CR2_TSVREFE | ADC_CR2_ADON;
 
 	/* Calibration for ADC1 */
 	adcCalibration(adc_mod1);
@@ -234,5 +238,17 @@ unsigned int adcReadDataReg(unsigned char adcModule)
 			/* Nothing */;
 	}
 	return adcVal;
+}
+
+/**
+ * Brief : Temperature value conversion in degree Celsius.
+ * Param : (uint16_t)ADC_VAL from DMA
+ * RetVal : (float) temperature.
+ */
+float get_Temperature(uint16_t ADC_VAL)
+{
+	float temperature;
+	temperature = ((V25 - VSENSE*ADC_VAL) / AVG_SLOPE) + 25;
+	return temperature;
 }
 
