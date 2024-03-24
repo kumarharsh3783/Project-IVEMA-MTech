@@ -21,7 +21,7 @@
  */
 int main(void)
 {
-	systemClockInit();					/* System Clock Frequency : 72 MHz */
+	systemClockInit(sysclk_56MHz);		/* System Clock Frequency : 56 MHz */
 	gpioInit();							/* All the GPIOs required for the project is initialized here */
 /*
 	uartInit();							 Initialise USART1: RFID and USART2: GPRS/GPS
@@ -30,8 +30,8 @@ int main(void)
 	lcdInit();							/* Initialise 16*2 LCD */
 	adcInit();							/* Initialise ADC1 Module */
 
-	/* Initialise DMA for 2 ADC conversions transfer */
-	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 2u);
+	/* Initialise DMA for 3 ADC conversions transfer */
+	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
 /*
 	uart1InterruptRxEnable();			Enable Receive Interrupt Enable for UART1
 	USART_Cmd(USART1, ENABLE); 			Enable USART1 - RFID
@@ -67,28 +67,46 @@ int main(void)
 
 		adcVal_mq7 = dmaRcvBuf[1];
 
-		//lcd_msDelay(1);
+		TemperatureValue = get_Temperature(dmaRcvBuf[2]);
 	}
 }
 
 /**
  * Brief:	Configure the system clock to run on 72MHz (Max allowed Clock setting).
- * Param:	none
+ * Param:	(sysclk_MHz) enumeration for selecting system clock frequency
  * Return:	none
  */
-void systemClockInit()
+void systemClockInit(sysclk_MHz sysclk)
 {
-	RCC->CR |= RCC_CR_HSEON;			/* External HSE Clock is set On */
+	RCC->CR |= RCC_CR_HSEON;			/* External HSE Clock is set On - 8.0 MHz crystal can be seen on the board HW */
 	while(!(RCC->CR & RCC_CR_HSERDY));	/* To check if HSE clock is stable or not */
 
 	RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |  RCC_CFGR_PLLMULL);  /* Reset the CFGR register */
 
-	RCC->CFGR &= ~(RCC_CFGR_PLLXTPRE);  /* PLLXTPRE bit set to 0 */
-	RCC->CFGR |= RCC_CFGR_PLLSRC;   	/* PLL source */
-	RCC->CFGR |= RCC_CFGR_PLLMULL9;  	/* PLL multiplier */
-	RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler */
-	RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler */
-	RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;  	/* APB2 pre-scaler */
+	RCC->CFGR &= ~(RCC_CFGR_PLLXTPRE);  /* PLLXTPRE bit set to 0 - HSE not divided before PLL Entry */
+	RCC->CFGR |= RCC_CFGR_PLLSRC;   	/* PLL source - HSE Clock selected */
+
+	switch(sysclk)
+	{
+	case sysclk_72MHz:
+		RCC->CFGR |= RCC_CFGR_PLLMULL9;  	/* PLL multiplier */
+		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 72 MHz*/
+		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 72/2 = 36 MHz */
+		RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;  	/* APB2 pre-scaler -> 72 MHz */
+		break;
+	case sysclk_56MHz:
+		RCC->CFGR |= RCC_CFGR_PLLMULL7;  	/* PLL multiplier */
+		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 56 MHz*/
+		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 56/2 = 28 MHz*/
+		RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;  	/* APB2 pre-scaler -> 56/2 = 28 MHz */
+		break;
+	default:
+		RCC->CFGR |= RCC_CFGR_PLLMULL9;  	/* PLL multiplier */
+		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 72 MHz*/
+		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 72/2 = 36 MHz */
+		RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;  	/* APB2 pre-scaler -> 72 MHz */
+		break;
+	}
 
 	RCC->CR |= RCC_CR_PLLON;			/* Turn on PLL */
 	while(!(RCC->CR & RCC_CR_PLLRDY)); 	/* wait till PLL is locked */
@@ -166,7 +184,7 @@ void dmaInit(uint32_t *src, uint32_t *dst, unsigned int len)
 	/* Assigning Memory Address into DMA register */
 	DMA1_Channel1->CMAR = (uint32_t)(dst);
 
-	/* Defining 2 number of data to transfer via DMA */
+	/* Defining number of data to transfer via DMA */
 	DMA1_Channel1->CNDTR = (DMA_CNDTR1_NDT & len);
 
 	/* Memory & Peripheral Size set to 16 bit */
