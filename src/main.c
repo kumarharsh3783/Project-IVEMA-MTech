@@ -28,42 +28,46 @@ int main(void)
 	timerInit();						 Initialise TIM4 with Interrupt feature enabled
 */
 	lcdInit();							/* Initialise 16*2 LCD */
-	adcInit(adc_mod1);					/* Initialise ADC1 Module */
+	adcInit();							/* Initialise ADC1 Module */
+
+	/* Initialise DMA for 2 ADC conversions transfer */
+	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 2u);
 /*
 	uart1InterruptRxEnable();			Enable Receive Interrupt Enable for UART1
 	USART_Cmd(USART1, ENABLE); 			Enable USART1 - RFID
 	USART_Cmd(USART2, ENABLE); 			Enable USART2 - SIM808
 */
 
-/*
-	 Configure I2C1 for the EEPROM
-	i2cInit();
-	i2cEnable();						 Enable i2c1
-*/
-
 	/* Display Welcome Message */
-	lcd_send_string("--------------------");
-	lcdCursorSet(1,0);					/* Change cursor to line 1 */
-	lcd_send_string("| Welcome to Savy  |");
-	lcdCursorSet(2,0);					/* Change cursor to line 2 */
-	lcd_send_string("| Electric Vehicle |");
-	lcdCursorSet(3,0);					/* Change cursor to line 3 */
-	lcd_send_string("--------------------");
-	lcd_msDelay(15000);					/* 15 Seconds Delay */
+//	lcd_send_string("--------------------");
+//	lcdCursorSet(1,0);					/* Change cursor to line 1 */
+//	lcd_send_string("| Welcome to Savy  |");
+//	lcdCursorSet(2,0);					/* Change cursor to line 2 */
+//	lcd_send_string("| Electric Vehicle |");
+//	lcdCursorSet(3,0);					/* Change cursor to line 3 */
+//	lcd_send_string("--------------------");
+	//lcd_msDelay(15000);					/* 15 Seconds Delay */
 
 	/* Display Initial message to User */
-	clearLcd();
-	lcdCursorSet(1,2);					/* Change cursor to line 1 */
-	lcd_send_string("Swipe Smart Card");
-	lcdCursorSet(2,2);					/* Change cursor to line 2 */
-	lcd_send_string("to start trip...");
+//	clearLcd();
+//	lcdCursorSet(1,2);					/* Change cursor to line 1 */
+//	lcd_send_string("Swipe Smart Card");
+//	lcdCursorSet(2,2);					/* Change cursor to line 2 */
+//	lcd_send_string("to start trip...");
+
+	/* Start the ADC Conversion */
+	adc1StartConversion();
 
 	while(1)							/* infinite loop */
 	{
-		adcVal_mq135 = adcStartConversion(adc_mod1);
-		Delay(100);
-		adcVal_mq7 = adcStartConversion(adc_mod1);
-		Delay(100);
+		/* LED LD2 Toggle */
+		GPIOA->ODR ^= GPIO_ODR_ODR5;
+
+		adcVal_mq135 = dmaRcvBuf[0];
+
+		adcVal_mq7 = dmaRcvBuf[1];
+
+		//lcd_msDelay(1);
 	}
 }
 
@@ -128,15 +132,13 @@ void gpioInit()
 
 	GPIOA->CRL |= GPIO_CRL_MODE0_0;								/* GPIO configured as Output mode @ 10 MHz */
 	GPIOA->CRL &= ~(GPIO_CRL_CNF0);								/* and General Purpose PUSH-PULL : RS bit */
-//	GPIOA->CRL |= GPIO_CRL_MODE1_0;								/* GPIO configured as Output mode @ 10 MHz */
-//	GPIOA->CRL &= ~(GPIO_CRL_CNF1);								/* and General Purpose PUSH-PULL : RW bit */
 	GPIOA->CRL |= GPIO_CRL_MODE1_0;								/* GPIO configured as Output mode @ 10 MHz */
 	GPIOA->CRL &= ~(GPIO_CRL_CNF1);								/* and General Purpose PUSH-PULL : EN bit */
 
 	/*<------------------LED GPIO Configuration----------------->*/
 	/* PA5 configured as Output push pull for LD2 */
-	GPIOA->CRL |= GPIO_CRL_MODE5_0;								/* GPIOC Pin13 configured as output @ 10MHz */
-	GPIOA->CRL &= ~(GPIO_CRL_CNF5);								/* GPIOC Pin13 configured as General Output Push Pull */
+	GPIOA->CRL |= GPIO_CRL_MODE5_0;								/* GPIOA Pin13 configured as output @ 10MHz */
+	GPIOA->CRL &= ~(GPIO_CRL_CNF5);								/* GPIOA Pin13 configured as General Output Push Pull */
 
 	/*<------------------ADC Pins Configuration----------------->*/
 	/* [PC2,PC3] are configured as Analog input pins */
@@ -144,6 +146,40 @@ void gpioInit()
 	GPIOC->CRL &= ~(GPIO_CRL_CNF2);								/* and configured as Analog mode */
 	GPIOC->CRL &= ~(GPIO_CRL_MODE3);							/* GPIOC Pin3 configured as Input mode */
 	GPIOC->CRL &= ~(GPIO_CRL_CNF3);								/* and configured as Analog mode */
+}
+
+/**
+ * Brief : DMA Initialisation API
+ * Param : (uint32_t *) src : Source Address
+ * 		(uint32_t *) dst : Destination Address
+ * 		(unsigned int) len : Number of Data to transfer via DMA
+ * RetVal : None.
+ */
+void dmaInit(uint32_t *src, uint32_t *dst, unsigned int len)
+{
+	/* Enable the peripheral clock for DMA1 */
+	RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+
+	/* Assigning Peripheral Address into DMA register */
+	DMA1_Channel1->CPAR = (uint32_t)(src);
+
+	/* Assigning Memory Address into DMA register */
+	DMA1_Channel1->CMAR = (uint32_t)(dst);
+
+	/* Defining 2 number of data to transfer via DMA */
+	DMA1_Channel1->CNDTR = (DMA_CNDTR1_NDT & len);
+
+	/* Memory & Peripheral Size set to 16 bit */
+	DMA1_Channel1->CCR |= DMA_CCR1_MSIZE_0 | DMA_CCR1_PSIZE_0;
+
+	/* Memory Increment Set to read Both ADC channels from Data Register */
+	DMA1_Channel1->CCR |= DMA_CCR1_MINC;
+
+	/* Circular mode enabled for ADC SCAN compatibility */
+	DMA1_Channel1->CCR |= DMA_CCR1_CIRC;
+
+	/* To enable DMA channel 1 as it contains ADC1 module mapped */
+	DMA1_Channel1->CCR |= DMA_CCR1_EN;
 }
 
 /**

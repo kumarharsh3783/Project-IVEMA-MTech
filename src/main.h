@@ -19,14 +19,16 @@
 /**
  * User-defined Variables
  */
-unsigned int adcVal_mq135;
-unsigned int adcVal_mq7;
+uint16_t dmaRcvBuf[2];
+uint16_t adcVal_mq135;
+uint16_t adcVal_mq7;
 
 /**
  * User-defined Function Declarations
  */
 void systemClockInit(void);
 void gpioInit(void);
+void dmaInit(uint32_t *, uint32_t *, unsigned int);
 void Delay(long int);
 void msDelay(int);
 

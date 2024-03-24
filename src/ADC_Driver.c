@@ -36,19 +36,27 @@ float map(long x, long in_min, long in_max, long out_min, long out_max)
 }
 
 /**
- * Brief : Enable peripheral clock, self calibration and Power ON for the ADC module.
+ * Brief : ADC Peripheral Clock Setting must not exceed 14MHz. Here ADC Prescaler is set to 6.
+ * 		Hence, SysClockFrequency / 6 will be set as ADC Peripheral Frequency. After setting the clock frequency,
+ * 		Requested ADC peripheral is powered on with proper calibration.
+ * Param : None.
+ * RetVal : None.
+ */
+void adcInit()
+{
+	adc1Init();			/* Initialisation for specific ADC module */
+}
+
+/**
+ * Brief : Self calibration for the ADC module.
  * Param : (unsigned char) adcModule : ADC1, ADC2 or ADC3.
  * RetVal : none
  */
-void adcPeripheralEnable(unsigned char adcModule)
+void adcCalibration(unsigned char adcModule)
 {
 	switch(adcModule)
 	{
 		case adc_mod1:
-
-			RCC->APB2ENR |= APB2ENR_ADC1EN; /* ADC1 interface clock enable */
-			ADC1->CR2 |= CR2_ADON;			/* ADC1 Power ON */
-
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
 			Delay(2);
@@ -61,10 +69,6 @@ void adcPeripheralEnable(unsigned char adcModule)
 			break;
 
 		case adc_mod2:
-
-			RCC->APB2ENR |= APB2ENR_ADC2EN; /* ADC2 interface clock enable */
-			ADC2->CR2 |= CR2_ADON;			/* ADC1 Power ON */
-
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
 			Delay(2);
@@ -77,10 +81,6 @@ void adcPeripheralEnable(unsigned char adcModule)
 			break;
 
 		case adc_mod3:
-
-			RCC->APB2ENR |= APB2ENR_ADC3EN; /* ADC3 interface clock enable */
-			ADC3->CR2 |= CR2_ADON;			/* ADC1 Power ON */
-
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
 			Delay(2);
@@ -97,30 +97,50 @@ void adcPeripheralEnable(unsigned char adcModule)
 }
 
 /**
- * Brief : ADC Peripheral Clock Setting must not exceed 14MHz. Here ADC Prescaler is set to 6.
- * 		Hence, SysClockFrequency / 6 will be set as ADC Peripheral Frequency. After setting the clock frequency,
- * 		Requested ADC peripheral is powered on with proper calibration.
- * Param : (unsigned char) adcModule : ADC1, ADC2 or ADC3
- * RetVal : None.
+ * Brief : Specific Initialisation for ADC1 Module.
  */
-void adcInit(unsigned char adcModule)
+
+void adc1Init()
 {
-	RCC->CFGR |= CFGR_ADCPRE_DIV6;			/* PCLK2 divided by 6 i.e. 72(max) / 6 = 12 MHz */
+	RCC->APB2ENR |= RCC_APB2ENR_ADC1EN ; 		/* ADC1 interface clock enable */
+	RCC->CFGR |= RCC_CFGR_ADCPRE_DIV6;			/* PCLK2 divided by 6 i.e. 72(max) / 6 = 12 MHz */
 
 	/* Regular Channel Sequence */
-	ADC1->SQR1 |= ADC_SQR1_L_0;				/* 0001b: 2 Conversions - PC2, PC3 */
+	ADC1->SQR1 |= ADC_SQR1_L_0;					/* 0001b: 2 Conversions - PC2, PC3 */
 
 	/**
 	 * Regular Conversion Sequence -
 	 * Conversion 1 : PC2 ADCx_IN12 - MQ 135
 	 * Conversion 2 : PC2 ADCx_IN13 - MQ 7
 	 */
-	ADC1->SQR3 |= (ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_3) | (ADC_SQR3_SQ2_0 | ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_3);
+	ADC1->SQR3 |= (ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_3);
+	ADC1->SQR3 |= (ADC_SQR3_SQ2_0 | ADC_SQR3_SQ2_2 | ADC_SQR3_SQ2_3);
 
 	/* Sampling time set to 1.17uS for ADC12_IN12 & ADC12_IN13 */
-	ADC1->SMPR1 &= ~(ADC_SMPR1_SMP12 | ADC_SMPR1_SMP13);
 
-	adcPeripheralEnable(adcModule);			/* Enable peripheral clock for specific ADC module */
+	/* ADC Conversion to be started with SWSTART in continuous mode */
+	ADC1->CR2 |= ADC_CR2_EXTSEL | ADC_CR2_EXTTRIG | ADC_CR2_CONT;
+
+	/* ADC Conversion to be started in SCAN mode with DMA enabled */
+	ADC1->CR2 |= ADC_CR2_DMA;
+	ADC1->CR1 |= ADC_CR1_SCAN;
+
+	/* First ADON High for Powering ON the ADC */
+	adc1ConverterEnable();
+
+	/* Calibration for ADC1 */
+	adcCalibration(adc_mod1);
+
+}
+
+/**
+ * Brief : De-initialise ADC module.
+ * Param : none
+ * RetVal : None.
+ */
+void adcDeInit(void)
+{
+	adcConverterDisable(adc_mod1);		/* Disable peripheral clock for specific ADC module */
 }
 
 /**
@@ -128,18 +148,13 @@ void adcInit(unsigned char adcModule)
  * Param : (unsigned char) adcModule : ADC1, ADC2 or ADC3.
  * RetVal : none
  */
-void adcPeripheralDisable(unsigned char adcModule)
+void adcConverterDisable(unsigned char adcModule)
 {
 	switch(adcModule)
 	{
 		case adc_mod1:
 
-			ADC1->CR2 &= ~(ADC_CR2_ADON);	/* Disable ADC1 Module */
-
-			ADC1->CR2 |= (ADC_CR2_RSTCAL);	/* Reset Calibration */
-
-			/* Wait till Calibration register initialised */
-			while(ADC1->CR2 & ADC_CR2_RSTCAL);
+			ADC1->CR2 &= ~ADC_CR2_ADON;		/* Disable ADC1 Conversion */
 
 			break;
 
@@ -147,21 +162,11 @@ void adcPeripheralDisable(unsigned char adcModule)
 
 			ADC2->CR2 &= ~(ADC_CR2_ADON);	/* Disable ADC2 Module */
 
-			ADC2->CR2 |= (ADC_CR2_RSTCAL);	/* Reset Calibration */
-
-			/* Wait till Calibration register initialised */
-			while(ADC2->CR2 & ADC_CR2_RSTCAL);
-
 			break;
 
 		case adc_mod3:
 
 			ADC3->CR2 &= ~(ADC_CR2_ADON);	/* Disable ADC3 Module */
-
-			ADC3->CR2 |= (ADC_CR2_RSTCAL);	/* Reset Calibration */
-
-			/* Wait till Calibration register initialised */
-			while(ADC3->CR2 & ADC_CR2_RSTCAL);
 
 			break;
 
@@ -170,31 +175,37 @@ void adcPeripheralDisable(unsigned char adcModule)
 	}
 }
 
-/**
- * Brief : De-initialise ADC module.
- * Param : (unsigned char) adcModule : ADC1, ADC2 or ADC3
- * RetVal : None.
- */
-void adcDeInit(unsigned char adcModule)
+/* Brief : Power ON ADC1 Module */
+void adc1ConverterEnable(void)
 {
-	adcPeripheralDisable(adcModule);		/* Disable peripheral clock for specific ADC module */
+	ADC1->CR2 |= ADC_CR2_ADON;			 	/* Enable ADC1 Conversion */
+}
+
+/* Brief : Power DOWN & disable calibration for ADC1 Module */
+void adc1ConverterDisable(void)
+{
+	ADC1->CR2 &= ~ADC_CR2_ADON;				/* Disable ADC1 Conversion */
+}
+
+/* Brief : Start ADC1 Module conversions */
+void adc1StartConversion()
+{
+	ADC1->CR2 |= ADC_CR2_SWSTART;			/* Start Conversion */
 }
 
 /**
- * Brief: Start the ADC conversion and read the data register once End of Conversion.
+ * Brief: Read the data register once End of Conversion.
  * Param: (unsigned char) adcModule : ADC1, ADC2 or ADC3
  * RetVal: (unsigned int) adcVal contains the ADC converted data.
  */
-
-unsigned int adcStartConversion(unsigned char adcModule)
+unsigned int adcReadDataReg(unsigned char adcModule)
 {
 	unsigned int adcVal;
 	switch(adcModule)
 	{
 		case adc_mod1:
 
-			ADC1->CR2 |= ADC_CR2_SWSTART;		/* Start Conversion */
-
+			adc1StartConversion();				/* Start Conversion */
 			/* wait for the End Of Conversion */
 			while(!(ADC1->SR & ADC_SR_EOC));
 
@@ -224,3 +235,4 @@ unsigned int adcStartConversion(unsigned char adcModule)
 	}
 	return adcVal;
 }
+
