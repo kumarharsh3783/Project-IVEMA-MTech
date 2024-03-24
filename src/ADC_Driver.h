@@ -47,10 +47,15 @@
  *********************************************************************/
 float map(long x, long in_min, long in_max, long out_min, long out_max);
 
-void adcInit(unsigned char);
-void adcPeripheralEnable(unsigned char);
-void adcDeInit(unsigned char);
-void adcPeripheralDisable(unsigned char);
-unsigned int adcStartConversion(unsigned char);
+void adcInit(void);
+void adcCalibration(unsigned char);
+void adcDeInit(void);
+void adcConverterDisable(unsigned char);
+unsigned int adcReadDataReg(unsigned char);
+
+void adc1Init(void);
+void adc1ConverterEnable(void);
+void adc1ConverterDisable(void);
+void adc1StartConversion(void);
 
 #endif /* ADC_DRIVER_H_ */
