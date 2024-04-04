@@ -15,6 +15,7 @@
 #include "lcd.h"
 #include "ADC_Driver.h"
 #include "external.h"
+#include "timer.h"
 
 /**
  * User-defined Variables

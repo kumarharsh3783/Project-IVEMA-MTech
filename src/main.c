@@ -25,8 +25,9 @@ int main(void)
 	gpioInit();							/* All the GPIOs required for the project is initialized here */
 /*
 	uartInit();							 Initialise USART1: RFID and USART2: GPRS/GPS
-	timerInit();						 Initialise TIM4 with Interrupt feature enabled
 */
+
+	timerInit();						/* Initialise TIM4 */
 	lcdInit();							/* Initialise 16*2 LCD */
 	adcInit();							/* Initialise ADC1 Module */
 
@@ -55,6 +56,9 @@ int main(void)
 //	lcdCursorSet(2,2);					/* Change cursor to line 2 */
 //	lcd_send_string("to start trip...");
 
+	/* wait for 90 seconds for gas sensor warming up */
+	delay_in_sec(90);
+
 	/* Start the ADC Conversion */
 	adc1StartConversion();
 
@@ -78,43 +82,78 @@ int main(void)
  */
 void systemClockInit(sysclk_MHz sysclk)
 {
-	RCC->CR |= RCC_CR_HSEON;			/* External HSE Clock is set On - 8.0 MHz crystal can be seen on the board HW */
-	while(!(RCC->CR & RCC_CR_HSERDY));	/* To check if HSE clock is stable or not */
+	/* Reset Registers to default state */
+	RCC->CR |= RCC_CR_HSION;
 
-	RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |  RCC_CFGR_PLLMULL);  /* Reset the CFGR register */
+	RCC->CFGR = (uint32_t)(0);
+	RCC->CR &= (uint32_t)((uint32_t)~(RCC_CR_PLLON | RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_HSEBYP));
 
-	RCC->CFGR &= ~(RCC_CFGR_PLLXTPRE);  /* PLLXTPRE bit set to 0 - HSE not divided before PLL Entry */
-	RCC->CFGR |= RCC_CFGR_PLLSRC;   	/* PLL source - HSE Clock selected */
+	/* External HSE Clock is set On - 8.0 MHz crystal can be seen on the board HW */
+	RCC->CR |= RCC_CR_HSEON;
+
+	/* To check if HSE clock is stable or not */
+	while(!(RCC->CR & RCC_CR_HSERDY));
+
+	/* Reset Flash Latency */
+	FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+
+	/* Enable Prefetch Buffer and Set Latency to Two wait states, if 48 MHz < SYSCLK <= 72 MHz */
+	FLASH->ACR |= (uint32_t)(FLASH_ACR_PRFTBE | FLASH_ACR_LATENCY_2);
+
+	/* Reset the CFGR register */
+	/* PLLXTPRE bit set to 0 - HSE not divided before PLL Entry */
+	RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |  RCC_CFGR_PLLMULL);
 
 	switch(sysclk)
 	{
 	case sysclk_72MHz:
-		RCC->CFGR |= RCC_CFGR_PLLMULL9;  	/* PLL multiplier */
+
 		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 72 MHz*/
 		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 72/2 = 36 MHz */
 		RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;  	/* APB2 pre-scaler -> 72 MHz */
+
+		/* PLL multiplier & HSE Clock Selected */
+		RCC->CFGR |= (RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
+
 		break;
+
 	case sysclk_56MHz:
-		RCC->CFGR |= RCC_CFGR_PLLMULL7;  	/* PLL multiplier */
+
 		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 56 MHz*/
-		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 56/2 = 28 MHz*/
+		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 56/2 = 28 MHz & APB1 Timer Clocks -> 28x2 = 56 MHz */
 		RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;  	/* APB2 pre-scaler -> 56/2 = 28 MHz */
+
+		/* PLL multiplier & HSE Clock Selected */
+		RCC->CFGR |= (RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL7);
+
 		break;
+
 	default:
-		RCC->CFGR |= RCC_CFGR_PLLMULL9;  	/* PLL multiplier */
+
 		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  	/* AHB pre-scaler -> 72 MHz*/
 		RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;  	/* APB1 pre-scaler -> 72/2 = 36 MHz */
 		RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;  	/* APB2 pre-scaler -> 72 MHz */
+
+		/* PLL multiplier & HSE Clock Selected */
+		RCC->CFGR |= (RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
+
 		break;
 	}
 
-	RCC->CR |= RCC_CR_PLLON;			/* Turn on PLL */
-	while(!(RCC->CR & RCC_CR_PLLRDY)); 	/* wait till PLL is locked */
+	/* Turn on PLL */
+	RCC->CR |= RCC_CR_PLLON;
 
-	RCC->CFGR |= RCC_CFGR_SW_PLL; 		/* PLL is selected as system clock */
-	while(!(RCC->CFGR & RCC_CFGR_SWS_PLL));	/* Check if system clock is stable or not */
+	/* wait till PLL is locked */
+	while(!(RCC->CR & RCC_CR_PLLRDY));
 
-	SystemCoreClockUpdate();			/* Update the systick */
+	/* PLL is selected as system clock */
+	RCC->CFGR |= RCC_CFGR_SW_PLL;
+
+	/* Check if system clock is stable or not */
+	while(!(RCC->CFGR & RCC_CFGR_SWS_PLL));
+
+	/* Update the systick */
+	SystemCoreClockUpdate();
 }
 
 /**
