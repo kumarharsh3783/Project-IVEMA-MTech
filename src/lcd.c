@@ -163,13 +163,16 @@ void lcdtimerInit()
 	/* Clock to TIM3 Peripheral */
 	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 
-	/* Configuring Clock for 1MHz i.e. 72MHz/72 = 1MHz; T = 1us*/
+	/* Configuring Clock for 1MHz i.e. 56MHz/56 = 1MHz; T = 1us (timing for per CNT)
+	 * Timer Clock Freq = ( Timer Peripheral Clock Freq / (Prescaler+1) )
+	 * Here we are not using the timer feature of overflowing via ARR register.
+	 * Given ARR as maximum 16 bit value as we can doing manual counting for creating delay */
+
 	TIM3->ARR = 65535;
-	TIM3->PSC = 72-1;
+	TIM3->PSC = 56-1;
 
 	/* Enable the timer 3 and wait till the UIF flag */
 	TIM3->CR1 |= TIM_CR1_CEN;
-	while(!(TIM3->SR & TIM_SR_UIF));
 }
 
 /**
@@ -189,10 +192,10 @@ void lcd_usDelay(int uscount)
  */
 void lcd_msDelay(int mscount)
 {
-	while(mscount != 0)
+	while(mscount)
 	{
 		/* delay of 1000 us = 1 ms */
 		lcd_usDelay(1000);
-		mscount--;
+		--mscount;
 	}
 }

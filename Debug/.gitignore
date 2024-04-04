@@ -2,3 +2,4 @@
 /StdPeriph_Driver/
 /src/
 /startup/
+/objects.mk
