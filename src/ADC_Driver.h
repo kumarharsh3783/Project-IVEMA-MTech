@@ -13,6 +13,7 @@
  *********************************************************************/
 #include "stm32f10x.h"
 #include "external.h"
+#include "timer.h"
 
 /*********************************************************************
  * Macros Definitions
@@ -42,6 +43,8 @@
 #define 	V25					1.43
 #define 	AVG_SLOPE			0.0043
 #define 	VSENSE				(3.3/4095)
+
+#define 	MAX_NO_OF_SAMPLES	10
 
 /*********************************************************************
  * Variable Declarations

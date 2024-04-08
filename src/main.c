@@ -21,33 +21,39 @@
  */
 int main(void)
 {
-	systemClockInit(sysclk_56MHz);		/* System Clock Frequency : 56 MHz */
-	gpioInit();							/* All the GPIOs required for the project is initialized here */
-/*
-	uartInit();							 Initialise USART1: RFID and USART2: GPRS/GPS
-*/
+	/** 1. System Initialisation **/
 
-	timerInit();						/* Initialise TIM4 */
-	lcdInit();							/* Initialise 16*2 LCD */
-	adcInit();							/* Initialise ADC1 Module */
-
+	/* System Clock Frequency : 56 MHz */
+	systemClockInit(sysclk_56MHz);
+	/* All the GPIOs required for the project is initialized here */
+	gpioInit();
+	/* Initialise TIM4 */
+	timerInit();
+	/* Initialise ADC1 Module */
+	adcInit();
 	/* Initialise DMA for 3 ADC conversions transfer */
 	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
-/*
-	uart1InterruptRxEnable();			Enable Receive Interrupt Enable for UART1
-	USART_Cmd(USART1, ENABLE); 			Enable USART1 - RFID
-	USART_Cmd(USART2, ENABLE); 			Enable USART2 - SIM808
-*/
+	/* Initialise USART1: RFID and USART2: GPRS/GPS */
+	//uartInit();
+	//uart1InterruptRxEnable();				/*Enable Receive Interrupt Enable for UART1*/
+	//USART_Cmd(USART1, ENABLE); 			/*Enable USART1 - RFID*/
+	//USART_Cmd(USART2, ENABLE); 			/*Enable USART2 - SIM808*/
 
-	/* Display Welcome Message */
-//	lcd_send_string("--------------------");
-//	lcdCursorSet(1,0);					/* Change cursor to line 1 */
-//	lcd_send_string("| Welcome to Savy  |");
-//	lcdCursorSet(2,0);					/* Change cursor to line 2 */
-//	lcd_send_string("| Electric Vehicle |");
-//	lcdCursorSet(3,0);					/* Change cursor to line 3 */
-//	lcd_send_string("--------------------");
-	//lcd_msDelay(15000);					/* 15 Seconds Delay */
+	/** End of System Initialisation **/
+
+	/** 2. Display Peripheral Init **/
+
+	/* Initialise 16*2 LCD */
+	lcdInit();
+
+	/** End of Display Peripheral Init **/
+
+	/** 3. Display Message on LCD "Gas Sensors Warming Up" **/
+
+	lcdCursorSet(0,0);
+	lcd_send_string("MQ Gas Sensors  ");
+	lcdCursorSet(1,0);					/* Change cursor to line 1 */
+	lcd_send_string("warming up! Wait");
 
 	/* Display Initial message to User */
 //	clearLcd();
@@ -56,22 +62,53 @@ int main(void)
 //	lcdCursorSet(2,2);					/* Change cursor to line 2 */
 //	lcd_send_string("to start trip...");
 
-	/* wait for 90 seconds for gas sensor warming up */
-	delay_in_sec(90);
+	/** End of Display Message on LCD "Gas Sensors Warming Up" **/
+
+	/** 4. Wait for 90 seconds for gas sensor warming up **/
+
+	delay_in_sec(15);
+
+	/** End of Wait for 90 seconds for gas sensor warming up **/
+
+	/** 5. Read ADC values for the Sensors **/
 
 	/* Start the ADC Conversion */
 	adc1StartConversion();
 
-	while(1)							/* infinite loop */
+	/* infinite loop */
+	while(1)
 	{
 		/* LED LD2 Toggle */
 		GPIOA->ODR ^= GPIO_ODR_ODR5;
 
-		adcVal_mq135 = dmaRcvBuf[0];
+		/** 6. Calculate Average value for last 10 samples for each sensor **/
 
-		adcVal_mq7 = dmaRcvBuf[1];
+		Get_AverageAdcVal();
 
-		TemperatureValue = get_Temperature(dmaRcvBuf[2]);
+		/** End of Calculate Average value for last 10 samples for each sensor **/
+
+		/** 8. Display average PPM and temperature values on LCD **/
+
+		clearLcd();
+
+		sprintf(sensorDataStr, "%lu", avgAdcVal_mq135);
+		lcdCursorSet(0,0);
+		lcd_send_string("  MQ135 ");
+		lcd_send_string(sensorDataStr);
+
+		sprintf(sensorDataStr, "%lu", avgAdcVal_mq7);
+		lcdCursorSet(1,0);
+		lcd_send_string("MQ7 ");
+		lcd_send_string(sensorDataStr);
+
+		sprintf(sensorDataStr, "%.2f", avgTemperatureValue);
+		lcdCursorSet(1,9);
+		lcd_send_string("T ");
+		lcd_send_string(sensorDataStr);
+
+		/** End of Display average PPM and temperature values **/
+
+		delay_in_sec(10);
 	}
 }
 
@@ -240,24 +277,34 @@ void dmaInit(uint32_t *src, uint32_t *dst, unsigned int len)
 }
 
 /**
- * Brief:	Delay function
- * Param:	(long int) count - to count while delaying
- * Return:	none
+ * Brief :
+ *
  */
-void Delay(long int count)
+void Get_AverageAdcVal()
 {
-	while(count!=0)
-		count--;
-}
+	uint8_t readSamples;
 
-void msDelay(int count)
-{
-	int extCount;
-	for(extCount=0; extCount < 5125; extCount++)
+	avgAdcVal_mq135 = 0;
+	avgAdcVal_mq7 = 0;
+	avgTemperatureValue = 0.0;
+
+	for(readSamples = 0; readSamples < MAX_NO_OF_SAMPLES; readSamples++)
 	{
-		while(count!=0)
-		{
-			count--;
-		}
+		/* Reading mq135 sensor */
+		adcVal_mq135 = dmaRcvBuf[0];
+		/* Reading mq7 sensor */
+		adcVal_mq7 = dmaRcvBuf[1];
+		/* Reading Temperature sensor */
+		TemperatureValue = get_Temperature(dmaRcvBuf[2]);
+
+		/* Adding 10 samples for each parameter */
+		avgAdcVal_mq135 += (uint32_t)adcVal_mq135;
+		avgAdcVal_mq7 += (uint32_t)adcVal_mq7;
+		avgTemperatureValue += TemperatureValue;
 	}
+
+	/* Calculating Average Values */
+	avgAdcVal_mq135 /= MAX_NO_OF_SAMPLES;
+	avgAdcVal_mq7 /= MAX_NO_OF_SAMPLES;
+	avgTemperatureValue /= MAX_NO_OF_SAMPLES;
 }

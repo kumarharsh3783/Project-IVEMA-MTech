@@ -32,5 +32,6 @@ void timer2ON(void);
 void timer2OFF(void);
 
 void delay_in_sec(unsigned int);
+void delay_in_ms(unsigned int);
 
 #endif /* TIMER_H_ */

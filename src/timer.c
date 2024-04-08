@@ -72,3 +72,27 @@ void delay_in_sec(unsigned int seconds)
 	/* End the timer 4 */
 	timer4OFF();
 }
+
+/** Brief : Delay in milliseconds API */
+void delay_in_ms(unsigned int ms)
+{
+	DELAY_mSECS = ms;
+
+	/* Reset the Counter */
+	TIM4->CNT = 0;
+
+	/* Start the timer 4 */
+	timer4ON();
+
+	while(DELAY_mSECS)
+	{
+		/* wait until 1ms */
+		while(!(TIM4->SR & TIM_SR_UIF));
+
+		TIM4->SR &= ~(TIM_SR_UIF);			/* Clearing interrupt flag */
+		--DELAY_mSECS;
+	}
+
+	/* End the timer 4 */
+	timer4OFF();
+}

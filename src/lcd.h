@@ -14,6 +14,12 @@
 #include "stm32f10x.h"
 
 /**
+ * Macro Definitions
+ */
+#define LCD_20_4 	0
+#define LCD_16_2	1
+
+/**
  * User-defined Variables
  */
 int lcdIndex;

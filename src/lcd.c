@@ -20,14 +20,17 @@
 void lcdInit()
 {
 	lcdtimerInit();
-	lcd_msDelay(150);						/* wait for LCD Power ON time > 40ms */
+	lcd_msDelay(15);						/* wait for LCD Power ON time 15ms */
 	uint8_t fourBitLcdCmd[6] = {0x02,0x28,0x0c,0x06,0x01,0x80};
 
 	for(lcdIndex = 0;lcdIndex<6;lcdIndex++)
 	{
 		sendLcdCmd(fourBitLcdCmd[lcdIndex]);
-		lcd_usDelay(500);
+		lcd_msDelay(5);
 	}
+
+	/* Initialisation Sequence wait time 500 ms */
+	lcd_msDelay(500);
 }
 
 /**
@@ -37,21 +40,29 @@ void lcdCursorSet(int row, int col)
 {
 	switch (row)
 	{
+#if(LCD_16_2 || LCD_20_4)
 		case 0:
 			col |= 0x80;
 			break;
+#endif
+#if(LCD_16_2 || LCD_20_4)
 		case 1:
 			col |= 0xC0;
 			break;
+#endif
+#if(LCD_20_4)
 		case 2:
 			col += 0x94;
 			break;
+#endif
+#if(LCD_20_4)
 		case 3:
 			col += 0xD4;
 			break;
+#endif
 	}
 	sendLcdCmd(col);						/* Send command to set the cursor position */
-	lcd_usDelay(500);
+	lcd_msDelay(5);
 }
 
 /**
@@ -60,9 +71,9 @@ void lcdCursorSet(int row, int col)
 void clearLcd(void)
 {
 	sendLcdCmd(0x01);						/* Clear display */
-	lcd_usDelay(500);
+	lcd_msDelay(5);
 	sendLcdCmd(0x80);						/* set cursor at pos. (0,0) */
-	lcd_usDelay(500);
+	lcd_msDelay(5);
 }
 
 /**
@@ -73,7 +84,7 @@ void lcd_send_string (char *str)
 	while(*str)
 	{
 		sendLcdData(*str++);
-		lcd_usDelay(500);
+		lcd_msDelay(5);
 	}
 }
 
@@ -87,10 +98,10 @@ void sendLcdCmd(uint8_t command)
 	lcdData = (command & 0xf0);			/* Separating 8 bit command into nibbles to send to lcd 4 bit */
 	lcdData = lcdData>>4;
 	lcdCmdWrite((uint16_t)lcdData);		/* sending higher nibble (MSBs) */
-	//lcd_msDelay(20);					/* Delay provided for lcd processing */
+	//lcd_msDelay(1);					/* Delay provided for lcd processing */
 	lcdData = (command & 0x0f);
 	lcdCmdWrite((uint16_t)lcdData);		/* sending lower nibble (LSBs) */
-//	lcd_msDelay(10);					/* Delay provided for lcd processing */
+	//lcd_msDelay(1);					/* Delay provided for lcd processing */
 }
 
 /**
@@ -103,10 +114,10 @@ void sendLcdData(uint8_t dat)
 	lcdData = (dat & 0xf0);				/* Separating 8 bit data into nibbles to send to lcd 4 bit */
 	lcdData = lcdData>>4;
 	lcdDataWrite((uint16_t)lcdData);	/* sending higher nibble (MSBs) */
-	//lcd_msDelay(20);						/* Delay provided for lcd processing */
+	//lcd_msDelay(1);						/* Delay provided for lcd processing */
 	lcdData = (dat & 0x0f);
 	lcdDataWrite((uint16_t)lcdData);	/* sending lower nibble (LSBs) */
-//	lcd_msDelay(10);						/* Delay provided for lcd processing */
+	//lcd_msDelay(1);						/* Delay provided for lcd processing */
 }
 
 /**
@@ -121,9 +132,9 @@ void lcdCmdWrite(uint16_t cmd)
 	GPIOA->BSRR	|= GPIO_BSRR_BR0;		/* RS = 0 */
 //	GPIOA->BSRR	|= GPIO_BSRR_BR4;		/* RW = 0 */
 	GPIOA->BSRR	|= GPIO_BSRR_BS1;		/* EN = 1 */
-	lcd_msDelay(1);
+	lcd_usDelay(2);
 	GPIOA->BSRR |= GPIO_BSRR_BR1;		/* EN = 0 */
-	lcd_msDelay(1);
+	lcd_usDelay(2);
 }
 
 /**
@@ -138,9 +149,9 @@ void lcdDataWrite(uint16_t data)
 	GPIOA->BSRR	|= GPIO_BSRR_BS0;		/* RS = 1 */
 //	GPIOA->BSRR	|= GPIO_BSRR_BR4;		/* RW = 0 */
 	GPIOA->BSRR	|= GPIO_BSRR_BS1;		/* EN = 1 */
-	lcd_msDelay(1);
+	lcd_usDelay(2);
 	GPIOA->BSRR |= GPIO_BSRR_BR1;		/* EN = 0 */
-	lcd_msDelay(1);
+	lcd_usDelay(2);
 }
 
 /**
