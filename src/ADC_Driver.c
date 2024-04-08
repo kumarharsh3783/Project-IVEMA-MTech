@@ -59,7 +59,7 @@ void adcCalibration(unsigned char adcModule)
 		case adc_mod1:
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
-			Delay(2);
+			delay_in_ms(2);
 
 			ADC1->CR2 |= CR2_CAL;			/* Calibration is started by setting the CAL bit in the ADC_CR2 register */
 
@@ -71,7 +71,7 @@ void adcCalibration(unsigned char adcModule)
 		case adc_mod2:
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
-			Delay(2);
+			delay_in_ms(2);
 
 			ADC2->CR2 |= CR2_CAL;			/* Calibration is started by setting the CAL bit in the ADC_CR2 register */
 
@@ -83,7 +83,7 @@ void adcCalibration(unsigned char adcModule)
 		case adc_mod3:
 			/*	Before starting a calibration, the ADC must have been in power-on state (ADON bit = ‘1’) for
 			at least two ADC clock cycles. */
-			Delay(2);
+			delay_in_ms(2);
 
 			ADC3->CR2 |= CR2_CAL;			/* Calibration is started by setting the CAL bit in the ADC_CR2 register */
 
