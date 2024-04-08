@@ -66,7 +66,7 @@ int main(void)
 
 	/** 4. Wait for 90 seconds for gas sensor warming up **/
 
-	delay_in_sec(15);
+	delay_in_sec(90);
 
 	/** End of Wait for 90 seconds for gas sensor warming up **/
 
