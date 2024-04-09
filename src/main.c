@@ -13,10 +13,10 @@
 
 /**
  * Brief:	Hardware Connection Details
- * 			USART1[rfid] | USART2[sim808]
+ * 			USART2[sim900a]
  * --------------------------------------
- * 	TX:		PA9			 |			PA2
- * 	RX:		PA10		 |			PA3
+ * 	TX:		PA2
+ * 	RX:		PA3
  * 	-------------------------------------
  */
 int main(void)
@@ -34,10 +34,9 @@ int main(void)
 	/* Initialise DMA for 3 ADC conversions transfer */
 	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
 	/* Initialise USART1: RFID and USART2: GPRS/GPS */
-	//uartInit();
-	//uart1InterruptRxEnable();				/*Enable Receive Interrupt Enable for UART1*/
-	//USART_Cmd(USART1, ENABLE); 			/*Enable USART1 - RFID*/
-	//USART_Cmd(USART2, ENABLE); 			/*Enable USART2 - SIM808*/
+	uartInit();
+	/* Enable USART2 - SIM900a */
+	USART_Cmd(USART2, ENABLE);
 
 	/** End of System Initialisation **/
 
@@ -54,13 +53,6 @@ int main(void)
 	lcd_send_string("MQ Gas Sensors  ");
 	lcdCursorSet(1,0);					/* Change cursor to line 1 */
 	lcd_send_string("warming up! Wait");
-
-	/* Display Initial message to User */
-//	clearLcd();
-//	lcdCursorSet(1,2);					/* Change cursor to line 1 */
-//	lcd_send_string("Swipe Smart Card");
-//	lcdCursorSet(2,2);					/* Change cursor to line 2 */
-//	lcd_send_string("to start trip...");
 
 	/** End of Display Message on LCD "Gas Sensors Warming Up" **/
 
