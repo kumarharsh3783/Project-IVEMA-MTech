@@ -21,28 +21,28 @@
  */
 int main(void)
 {
-	/** 1. System Initialisation **/
+	/** 1. System Initialization **/
 
 	/* System Clock Frequency : 56 MHz */
 	systemClockInit(sysclk_56MHz);
 	/* All the GPIOs required for the project is initialized here */
 	gpioInit();
-	/* Initialise TIM4 */
+	/* Initialize TIM4 */
 	timerInit();
-	/* Initialise ADC1 Module */
+	/* Initialize ADC1 Module */
 	adcInit();
-	/* Initialise DMA for 3 ADC conversions transfer */
+	/* Initialize DMA for 3 ADC conversions transfer */
 	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
-	/* Initialise USART1: RFID and USART2: GPRS/GPS */
+	/* Initialize USART1: RFID and USART2: GPRS/GPS */
 	uartInit();
 	/* Enable USART2 - SIM900a */
 	USART_Cmd(USART2, ENABLE);
 
-	/** End of System Initialisation **/
+	/** End of System Initialization **/
 
 	/** 2. Display Peripheral Init **/
 
-	/* Initialise 16*2 LCD */
+	/* Initialize 16*2 LCD */
 	lcdInit();
 
 	/** End of Display Peripheral Init **/
