@@ -14,9 +14,10 @@
 #include "stm32f10x.h"
 #include "lcd.h"
 #include "ADC_Driver.h"
-#include "external.h"
+#include "uart.h"
 #include "timer.h"
 #include "stdio.h"
+#include "external.h"
 
 /**************************
  * User-defined Variables

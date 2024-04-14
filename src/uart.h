@@ -13,9 +13,9 @@
  */
 #include "stm32f10x.h"
 #include "external.h"
-#include "serverApi.h"
+//#include "serverApi.h"
 #include "timer.h"
-#include "lcd.h"
+//#include "lcd.h"
 #include "string.h"
 
 /**
@@ -33,7 +33,6 @@
  */
 USART_InitTypeDef usart;
 int txIndex;
-int riderIdPos;
 
 
 /**
@@ -43,6 +42,5 @@ void uartInit(void);
 void changeBaud(uint32_t);
 void uartSendData(char*);
 void uartReceiveData(char*,int);
-int strcmpArr(char*,char(*)[13]);
 
 #endif	/* UART_H_ */

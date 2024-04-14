@@ -11,10 +11,8 @@
 /**
  * External variables and functions
  */
-
-extern void Delay(long int);
-extern void msDelay(int);
-extern void lcd_usDelay(int);
-extern void lcd_msDelay(int);
+extern uint8_t sysTimeout;
+extern void delay_in_sec(unsigned int);
+extern void delay_in_ms(unsigned int);
 
 #endif /* EXTERNAL_H_ */
