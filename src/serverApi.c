@@ -282,7 +282,7 @@ int sendData_toServer()
 		/*Generate an ErrorCode for Error Handler to display appropriate message in LCD*/
 		return 0;
 	}
-	searchStringFunc(serverResponse,"\"jwtToken\":\"",100,jwtToken); /* extract the JSON web token */
+	//searchStringFunc(serverResponse,"\"jwtToken\":\"",100,jwtToken); /* extract the JSON web token */
 
 	resetBuffer(serverResponse,SERVER_RESPONSE_SIZE);		/* Reset serverResponse Buffer with NULL characters */
 

@@ -32,10 +32,10 @@ endif
 all: IVEMA.elf
 
 # Tool invocations
-IVEMA.elf: $(OBJS) $(USER_OBJS) C:\Users\Kumar\ Harsh\Documents\Sandbox\Project-IVEMA-MTech/LinkerScript.ld
+IVEMA.elf: $(OBJS) $(USER_OBJS) D:\Sandbox\Project-IVEMA-MTech/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"C:/Users/Kumar Harsh/Documents/Sandbox/Project-IVEMA-MTech/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "IVEMA.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"D:/Sandbox/Project-IVEMA-MTech/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "IVEMA.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
