@@ -63,7 +63,7 @@ void uartSendData(char* txBuffer)
  * Param:	(pointer to a char) Address where received response string is saved, (int) No. of lines to read
  * Return:	none
  */
-void uartReceiveData(char* sim808Response,int lineCount)
+void uartReceiveData(char* sim900Response,int lineCount)
 {
 	int responseIndex = 0;
 	uint16_t rBuf;
@@ -75,11 +75,11 @@ void uartReceiveData(char* sim808Response,int lineCount)
 
 		while(!USART_GetFlagStatus(USART2, USART_FLAG_RXNE))		/* wait till receive data buffer is empty */
 		{
-			if(sysTimeout == 1)
+			if(sysTimeout == TIMEOUT_DETECTION)
 			{
-				TIM_Cmd(TIM2, DISABLE);									/* Disable Timer 2 for timeout feature */
+				TIM_Cmd(TIM2, DISABLE);								/* Disable Timer 2 for timeout feature */
 				TIM2->CNT = 0;
-				sysTimeout = 0;											/* Default status */
+				sysTimeout = 0;										/* Default status */
 				return;
 			}
 		}
@@ -95,38 +95,14 @@ void uartReceiveData(char* sim808Response,int lineCount)
 		}
 		else
 		{
-			sim808Response[responseIndex] = rBuf;				/* save into sim808Response Buffer */
+			sim900Response[responseIndex] = rBuf;				/* save into sim900Response Buffer */
 			responseIndex++;
 		}
 	}
-	sim808Response[responseIndex] = '\0';						/* adding null char at the end of string */
-	TIM_Cmd(TIM2, DISABLE);										/* Disable Timer 2 for timeout feature */
-	TIM2->CNT = 0;
-	timeout = 0;												/* Reset timeout */
-}
+	sim900Response[responseIndex] = '\0';						/* adding null char at the end of string */
 
-int strcmpArr(char* searchstring, char (*refstring)[13])
-{
-	if(strcmp(refstring[0],searchstring) == 0)
-	{
-		riderIdPos = 0;											/* identify the position of riderId in riderRfid array */
-		return 0;
-	}
-	else if(strcmp(refstring[1],searchstring) == 0)
-	{
-		riderIdPos = 1;											/* identify the position of riderId in riderRfid array */
-		return 0;
-	}
-	else if(strcmp(refstring[2],searchstring) == 0)
-	{
-		riderIdPos = 2;											/* identify the position of riderId in riderRfid array */
-		return 0;
-	}
-	else
-	{
-		/**** Return 1 if string not found in the string array ****/
-		riderIdPos = 99;										/* arbitary value of pos to show invalid value */
-		return 1;
-	}
+	/* Disable Timer 2 for timeout feature */
+	TIM_Cmd(TIM2, DISABLE);
+	TIM2->CNT = 0;
 }
 
