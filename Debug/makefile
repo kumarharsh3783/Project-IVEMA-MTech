@@ -35,7 +35,7 @@ all: IVEMA.elf
 IVEMA.elf: $(OBJS) $(USER_OBJS) D:\Sandbox\Project-IVEMA-MTech/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"D:/Sandbox/Project-IVEMA-MTech/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "IVEMA.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -u _printf_float -T"D:/Sandbox/Project-IVEMA-MTech/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "IVEMA.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

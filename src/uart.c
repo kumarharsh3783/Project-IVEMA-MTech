@@ -13,23 +13,23 @@
 USART_InitTypeDef* USART_InitStruct = &usart;
 
 /**
- * Brief:	Initialise USART2
+ * Brief:	Initialize USART1
  * Param:	none
  * Return:	none
  */
 void uartInit()
 {
 	/* Clock to USART Peripherals */
-	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;			/*Clock Enabled in USART2 peripheral*/
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;			/*Clock Enabled in USART1 peripheral*/
 
-	/* USART Initialisation */
+	/* USART Initialization */
 	USART_StructInit(USART_InitStruct);				/*Baud: 9600 bits per second*/
 
 	/*Changing the Baud Rate from default 9600 to 57600*/
 	changeBaud(BAUD_57600);
 
-	/* Initialising USART 2 */
-	USART_Init(USART2,USART_InitStruct);
+	/* Initializing USART 2 */
+	USART_Init(USART1,USART_InitStruct);
 }
 
 /**
@@ -51,11 +51,11 @@ void uartSendData(char* txBuffer)
 {
 	for(txIndex = 0; txBuffer[txIndex]!='\0'; txIndex++)
 	{
-		USART_SendData(USART2, (uint16_t)txBuffer[txIndex]);	//instruct to dump TDR value into shift register
-		while(!USART_GetFlagStatus(USART2, USART_FLAG_TXE));	//wait till TDR is empty
+		USART_SendData(USART1, (char)txBuffer[txIndex]);		//instruct to dump TDR value into shift register
+		while(!USART_GetFlagStatus(USART1, USART_FLAG_TXE));	//wait till TDR is empty
 	}
-	while(!USART_GetFlagStatus(USART2, USART_FLAG_TC));			//wait till TC get set
-	USART_ClearFlag(USART2, USART_FLAG_TC);						//clearing TC bit for next transmission frame
+	while(!USART_GetFlagStatus(USART1, USART_FLAG_TC));			//wait till TC get set
+	USART_ClearFlag(USART1, USART_FLAG_TC);						//clearing TC bit for next transmission frame
 }
 
 /**
@@ -68,22 +68,23 @@ void uartReceiveData(char* sim900Response,int lineCount)
 	int responseIndex = 0;
 	uint16_t rBuf;
 
-	TIM_Cmd(TIM2, ENABLE);											/* Enable Timer 2 for timeout feature */
+	sysTimeout = 0;												/* Default status */
+	TIM_Cmd(TIM2, ENABLE);										/* Enable Timer 2 for timeout feature */
 
 	while(lineCount != 0)
 	{
 
-		while(!USART_GetFlagStatus(USART2, USART_FLAG_RXNE))		/* wait till receive data buffer is empty */
+		while(!USART_GetFlagStatus(USART1, USART_FLAG_RXNE))	/* wait till receive data buffer is empty */
 		{
 			if(sysTimeout == TIMEOUT_DETECTION)
 			{
-				TIM_Cmd(TIM2, DISABLE);								/* Disable Timer 2 for timeout feature */
+				TIM_Cmd(TIM2, DISABLE);							/* Disable Timer 2 for timeout feature */
 				TIM2->CNT = 0;
-				sysTimeout = 0;										/* Default status */
+				sysTimeout = 0;									/* Default status */
 				return;
 			}
 		}
-		rBuf = USART_ReceiveData(USART2);
+		rBuf = USART_ReceiveData(USART1);
 
 		if(rBuf == '\n')
 		{
@@ -104,5 +105,6 @@ void uartReceiveData(char* sim900Response,int lineCount)
 	/* Disable Timer 2 for timeout feature */
 	TIM_Cmd(TIM2, DISABLE);
 	TIM2->CNT = 0;
+	sysTimeout = 0;												/* Default status */
 }
 

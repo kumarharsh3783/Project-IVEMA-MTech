@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "stdio.h"
 #include "external.h"
+#include "serverApi.h"
 
 /**************************
  * User-defined Variables
@@ -31,7 +32,9 @@ typedef enum
 }sysclk_MHz;
 
 /* Sensor Data to String Buffer */
-char sensorDataStr[8];
+char tempDataStr[8];
+char mq135DataStr[8];
+char mq7DataStr[8];
 
 /* DMA Receive Buffer */
 uint16_t dmaRcvBuf[3];
@@ -53,5 +56,8 @@ void systemClockInit(sysclk_MHz);
 void gpioInit(void);
 void dmaInit(uint32_t *, uint32_t *, unsigned int);
 void Get_AverageAdcVal(void);
+void PowerOnLed(void);
+void PowerOffLed(void);
+void ToggleLed(void);
 
 #endif /* MAIN_H_ */

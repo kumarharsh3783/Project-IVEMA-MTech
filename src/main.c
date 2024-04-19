@@ -13,10 +13,10 @@
 
 /**
  * Brief:	Hardware Connection Details
- * 			USART2[sim900a]
+ * 			USART1[sim900a]
  * --------------------------------------
- * 	TX:		PA2
- * 	RX:		PA3
+ * 	TX:		PA9
+ * 	RX:		PA10
  * 	-------------------------------------
  */
 int main(void)
@@ -27,16 +27,17 @@ int main(void)
 	systemClockInit(sysclk_56MHz);
 	/* All the GPIOs required for the project is initialized here */
 	gpioInit();
+	/* Initialize USART1: GPRS/GPS */
+	uartInit();
+	/* Enable USART1 - SIM900a */
+	USART_Cmd(USART1, ENABLE);
 	/* Initialize TIM4 */
 	timerInit();
 	/* Initialize ADC1 Module */
 	adcInit();
 	/* Initialize DMA for 3 ADC conversions transfer */
 	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
-	/* Initialize USART1: RFID and USART2: GPRS/GPS */
-	uartInit();
-	/* Enable USART2 - SIM900a */
-	USART_Cmd(USART2, ENABLE);
+
 
 	/** End of System Initialization **/
 
@@ -46,6 +47,8 @@ int main(void)
 	lcdInit();
 
 	/** End of Display Peripheral Init **/
+
+	PowerOnLed();
 
 	/** 3. Display Message on LCD "Gas Sensors Warming Up" **/
 
@@ -58,7 +61,7 @@ int main(void)
 
 	/** 4. Wait for 90 seconds for gas sensor warming up **/
 
-	delay_in_sec(90);
+	delay_in_sec(9);
 
 	/** End of Wait for 90 seconds for gas sensor warming up **/
 
@@ -70,8 +73,7 @@ int main(void)
 	/* infinite loop */
 	while(1)
 	{
-		/* LED LD2 Toggle */
-		GPIOA->ODR ^= GPIO_ODR_ODR5;
+		ToggleLed();
 
 		/** 6. Calculate Average value for last 10 samples for each sensor **/
 
@@ -83,23 +85,23 @@ int main(void)
 
 		clearLcd();
 
-		sprintf(sensorDataStr, "%lu", avgAdcVal_mq135);
+		sprintf(mq135DataStr, "%lu", avgAdcVal_mq135);
 		lcdCursorSet(0,0);
 		lcd_send_string("  MQ135 ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(mq135DataStr);
 
-		sprintf(sensorDataStr, "%lu", avgAdcVal_mq7);
+		sprintf(mq7DataStr, "%lu", avgAdcVal_mq7);
 		lcdCursorSet(1,0);
 		lcd_send_string("MQ7 ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(mq7DataStr);
 
-		sprintf(sensorDataStr, "%.2f", avgTemperatureValue);
+		sprintf(tempDataStr, "%.2f", avgTemperatureValue);
 		lcdCursorSet(1,9);
 		lcd_send_string("T ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(tempDataStr);
 
 		/** End of Display average PPM and temperature values **/
-
+		sendData_toServer();
 		delay_in_sec(10);
 	}
 }
@@ -195,14 +197,15 @@ void gpioInit()
 	/* Clock to GPIO Peripherals - Port A, B, C */
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN;	/* Enable clock to GPIO Port A for UARTs and GPIO B LCD*/
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;							/* Enable clock to GPIO Port C for LED indicator */
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;							/* Alternate Function IO clock enabled */
+	//RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;							/* Alternate Function IO clock enabled */
 
 	/*<--------------USART Clock/GPIO Configuration------------->*/
+
+	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				 // TX pin PA9 configured as output @50MHz in alternate function push pull
+	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							 // RX pin PA10 configured as input in floating input mode
 /*
-	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				 TX pin PA9 configured as output @50MHz in alternate function push pull
-	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							 RX pin PA10 configured as input in floating input mode
-	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				 TX pin PA2 configured as output @50MHz in alternate function push pull
-	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							 RX pin PA3 configured as input in floating input mode
+	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				 // TX pin PA2 configured as output @50MHz in alternate function push pull
+	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							 // RX pin PA3 configured as input in floating input mode
 */
 
 	/*<------------------LCD GPIO Configuration----------------->*/
@@ -299,4 +302,34 @@ void Get_AverageAdcVal()
 	avgAdcVal_mq135 /= MAX_NO_OF_SAMPLES;
 	avgAdcVal_mq7 /= MAX_NO_OF_SAMPLES;
 	avgTemperatureValue /= MAX_NO_OF_SAMPLES;
+}
+
+/*********************************************
+ * ToggleLed
+ * Toggle the current state of the LED LD2
+ ********************************************/
+void ToggleLed()
+{
+	/* LED LD2 Toggle */
+	GPIOA->ODR ^= GPIO_ODR_ODR5;
+}
+
+/*********************************************
+ * PowerOnLed
+ * Switch ON the LED LD2
+ ********************************************/
+void PowerOnLed()
+{
+	/* LED LD2 ON */
+	GPIOA->ODR |= GPIO_ODR_ODR5;
+}
+
+/*********************************************
+ * PowerOffLed
+ * Switch OFF the LED LD2
+ ********************************************/
+void PowerOffLed()
+{
+	/* LED LD2 OFF */
+	GPIOA->ODR &= ~GPIO_ODR_ODR5;
 }
