@@ -68,6 +68,9 @@ void uartReceiveData(char* sim900Response,int lineCount)
 	int responseIndex = 0;
 	uint16_t rBuf;
 
+	/* Reset sim900Response Buffer with NULL characters */
+	resetBuffer(sim900Response,SIM900_RESPONSE_SIZE);
+
 	sysTimeout = 0;												/* Default status */
 	TIM_Cmd(TIM2, ENABLE);										/* Enable Timer 2 for timeout feature */
 

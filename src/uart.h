@@ -13,7 +13,7 @@
  */
 #include "stm32f10x.h"
 #include "external.h"
-//#include "serverApi.h"
+#include "serverApi.h"
 #include "timer.h"
 //#include "lcd.h"
 #include "string.h"

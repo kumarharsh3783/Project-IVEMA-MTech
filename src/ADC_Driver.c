@@ -111,7 +111,7 @@ void adc1Init()
 	/**
 	 * Regular Conversion Sequence -
 	 * Conversion 1 : PC2 ADCx_IN12 - MQ 135
-	 * Conversion 2 : PC2 ADCx_IN13 - MQ 7
+	 * Conversion 2 : PC3 ADCx_IN13 - MQ 7
 	 * Conversion 3 : ADCx_IN16 - Internal Temperature Sensor
 	 */
 	ADC1->SQR3 |= (ADC_SQR3_SQ1_2 | ADC_SQR3_SQ1_3);

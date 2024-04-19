@@ -160,6 +160,8 @@ int startGprs()
 	uartReceiveData(sim900Response,4);
 	uartSendData("AT+CGATT=1\r\n");		/* Attached to GPRS service */
 	uartReceiveData(sim900Response,2);
+	/* waiting to get attached to GPRS */
+	delay_in_ms(2000);
 	uartSendData("AT+CIPSHUT\r\n");		/* Deactivate GPRS PDP Context */
 	uartReceiveData(sim900Response,2);
 	uartSendData("AT+CIPMUX=0\r\n");	/* Single TCP/IP connection mode */
@@ -188,7 +190,7 @@ int startGprs()
 		return 0;
 	}
 	resetBuffer(serverConnect,80);					/* Reset with NULL chars */
-	strcpy(serverConnect,"AT+CIPSTART=\"TCP\",");	/* Reset the serverConnect command */
+	strcpy(serverConnect,"AT+CIPSTART=\"TCP\",\"");	/* Reset the serverConnect command */
 	uartSendData("AT+CIPSEND\r\n");		/* To send the data to server using POST or GET method*/
 	/* check for the editor start character */
 	uartReceiveData(sim900Response,1);
@@ -197,7 +199,6 @@ int startGprs()
 	{
 		return 0;
 	}
-	//msDelay(10000);
 	return 1;
 }
 
@@ -245,16 +246,19 @@ int sendData_toServer()
 
 	/* with ATE1 i.e. echo on, serverResponse will also capture API body which already contains '}', so with ATE1, param: '}' in API body + '}' expected in server response */
 	/* with ATE0 i.e. echo off, param:	'}' expected in server response alone */
-	uartReceiveData(sim900Response,4);
+	uartReceiveData(sim900Response,5);
 	searchStringFunc(sim900Response,"CLOSE",1,responseCode); /* extract the server response code */
 	if(systemResponseCheck(responseCode,"D") == Fail)
 	{
 		/*Generate an ErrorCode for Error Handler to display appropriate message in LCD*/
 		return 0;
 	}
+
+	delay_in_ms(2000);
+
 	/* Close the connection */
-	//uartSendData("AT+CIPSHUT\r\n");
-	//uartReceiveData(sim900Response,2);
+	uartSendData("AT+CIPSHUT\r\n");
+	uartReceiveData(sim900Response,2);
 
 	/* Reset sim900Response Buffer with NULL characters */
 	resetBuffer(sim900Response,SIM900_RESPONSE_SIZE);

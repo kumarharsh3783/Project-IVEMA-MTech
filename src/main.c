@@ -48,7 +48,7 @@ int main(void)
 
 	/** End of Display Peripheral Init **/
 
-	PowerOnLed();
+	PowerOffLed();
 
 	/** 3. Display Message on LCD "Gas Sensors Warming Up" **/
 
@@ -69,11 +69,12 @@ int main(void)
 
 	/* Start the ADC Conversion */
 	adc1StartConversion();
+	/* Dummy Read of Sensors once for Calibration */
+	Get_AverageAdcVal();
 
 	/* infinite loop */
 	while(1)
 	{
-		ToggleLed();
 
 		/** 6. Calculate Average value for last 10 samples for each sensor **/
 
@@ -101,8 +102,10 @@ int main(void)
 		lcd_send_string(tempDataStr);
 
 		/** End of Display average PPM and temperature values **/
+		PowerOnLed();
 		sendData_toServer();
-		delay_in_sec(10);
+		PowerOffLed();
+		delay_in_sec(50);
 	}
 }
 
