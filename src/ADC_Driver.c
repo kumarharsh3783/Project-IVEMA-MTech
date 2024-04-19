@@ -17,6 +17,17 @@
 /*********************************************************************
  * Function Definitions
  *********************************************************************/
+
+/*************************************************
+ * Brief:	ADC Hardware Connection Details
+ * 					ADC1 Module Used
+ * -----------------------------------------------
+ * 	MQ135 Gas Sensor  :	ADC1_Ch12 [PC2]
+ * 	MQ7 Gas Sensor	  :	ADC1_Ch13 [PC3]
+ * 	Temperature Sensor:	ADC1_Ch16 [Internally]
+ * 	----------------------------------------------
+ *************************************************/
+
 /**
  * Brief : Re-maps a number from one range to another range.
  * Param : 	value: the number to map.
@@ -44,7 +55,7 @@ float map(long x, long in_min, long in_max, long out_min, long out_max)
  */
 void adcInit()
 {
-	adc1Init();			/* Initialisation for specific ADC module */
+	adc1Init();			/* Initialization for specific ADC module */
 }
 
 /**
@@ -97,7 +108,7 @@ void adcCalibration(unsigned char adcModule)
 }
 
 /**
- * Brief : Specific Initialisation for ADC1 Module.
+ * Brief : Specific Initialization for ADC1 Module.
  */
 
 void adc1Init()
@@ -138,7 +149,7 @@ void adc1Init()
 }
 
 /**
- * Brief : De-initialise ADC module.
+ * Brief : De-initialize ADC module.
  * Param : none
  * RetVal : None.
  */
