@@ -20,6 +20,18 @@
 #include "external.h"
 #include "serverApi.h"
 
+/**********************
+ * MACRO DEFINITIONS
+ *********************/
+
+#define CFG_ENABLE_GPRS_DATA_TO_SERVER			1
+#define CFG_ENABLE_CRITICAL_THRESHOLD_CHECKS 	0
+
+#if CFG_ENABLE_CRITICAL_THRESHOLD_CHECKS
+#define mq135_critical_threshold_limit			(uint32_t)1200u
+#define mq7_critical_threshold_limit			(uint32_t)1200u
+#endif
+
 /**************************
  * User-defined Variables
  *************************/

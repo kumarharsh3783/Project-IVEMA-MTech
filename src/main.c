@@ -61,7 +61,7 @@ int main(void)
 
 	/** 4. Wait for 90 seconds for gas sensor warming up **/
 
-	delay_in_sec(9);
+	delay_in_sec(10);
 
 	/** End of Wait for 90 seconds for gas sensor warming up **/
 
@@ -72,7 +72,8 @@ int main(void)
 	/* Dummy Read of Sensors once for Calibration */
 	Get_AverageAdcVal();
 
-	/* infinite loop */
+	/** End of Read ADC values for the Sensors **/
+
 	while(1)
 	{
 
@@ -81,6 +82,10 @@ int main(void)
 		Get_AverageAdcVal();
 
 		/** End of Calculate Average value for last 10 samples for each sensor **/
+
+		/** 7. Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
+
+		/** End of Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
 
 		/** 8. Display average PPM and temperature values on LCD **/
 
@@ -102,10 +107,31 @@ int main(void)
 		lcd_send_string(tempDataStr);
 
 		/** End of Display average PPM and temperature values **/
-		PowerOnLed();
-		sendData_toServer();
-		PowerOffLed();
-		delay_in_sec(50);
+
+		/** 9. If sensor readings crosses the critical threshold limits **/
+
+#if CFG_ENABLE_CRITICAL_THRESHOLD_CHECKS
+		if( (avgAdcVal_mq135 > mq135_critical_threshold_limit) || (avgAdcVal_mq7 > mq7_critical_threshold_limit) )
+#endif
+		{
+		/** End of if sensor readings crosses the critical threshold limits **/
+
+#if CFG_ENABLE_GPRS_DATA_TO_SERVER
+
+		/** 10. If Wireless Connection successful, send sensor data to server !! **/
+
+			PowerOnLed();
+			sendData_toServer();
+			PowerOffLed();
+
+		/** End of if Wireless Connection successful, send sensor data to server !! **/
+#endif
+		}
+		/** 11. Timer Interval of 15 minutes **/
+
+		delay_in_sec(5);
+
+		/** End of Timer Interval of 15 minutes **/
 	}
 }
 

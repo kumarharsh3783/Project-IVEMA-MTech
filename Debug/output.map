@@ -3241,6 +3241,7 @@ Discarded input sections
  .group         0x00000000        0xc src/main.o
  .group         0x00000000        0xc src/main.o
  .group         0x00000000        0xc src/main.o
+ .group         0x00000000        0xc src/main.o
  .text          0x00000000        0x0 src/main.o
  .data          0x00000000        0x0 src/main.o
  .text.ToggleLed
@@ -4789,33 +4790,33 @@ LOAD c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17
                 0x000009ee       0x1d c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/compiler/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7-m/crtn.o
 OUTPUT(IVEMA.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x7ef9
+.debug_info     0x00000000     0x7f00
  .debug_info    0x00000000      0x89c StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_info    0x0000089c     0x1c54 StdPeriph_Driver/src/stm32f10x_tim.o
  .debug_info    0x000024f0      0x9e4 StdPeriph_Driver/src/stm32f10x_usart.o
- .debug_info    0x00002ed4      0x45c src/ADC_Driver.o
- .debug_info    0x00003330      0x5d0 src/lcd.o
- .debug_info    0x00003900      0xfac src/main.o
- .debug_info    0x000048ac      0xd29 src/serverApi.o
- .debug_info    0x000055d5      0xf2e src/syscalls.o
- .debug_info    0x00006503      0x450 src/system_stm32f10x.o
- .debug_info    0x00006953      0x740 src/timer.o
- .debug_info    0x00007093      0xe44 src/uart.o
- .debug_info    0x00007ed7       0x22 startup/startup_stm32.o
+ .debug_info    0x00002ed4      0x45f src/ADC_Driver.o
+ .debug_info    0x00003333      0x5d0 src/lcd.o
+ .debug_info    0x00003903      0xfb0 src/main.o
+ .debug_info    0x000048b3      0xd29 src/serverApi.o
+ .debug_info    0x000055dc      0xf2e src/syscalls.o
+ .debug_info    0x0000650a      0x450 src/system_stm32f10x.o
+ .debug_info    0x0000695a      0x740 src/timer.o
+ .debug_info    0x0000709a      0xe44 src/uart.o
+ .debug_info    0x00007ede       0x22 startup/startup_stm32.o
 
-.debug_abbrev   0x00000000     0x157e
+.debug_abbrev   0x00000000     0x15b8
  .debug_abbrev  0x00000000      0x1d4 StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_abbrev  0x000001d4      0x1c8 StdPeriph_Driver/src/stm32f10x_tim.o
  .debug_abbrev  0x0000039c      0x194 StdPeriph_Driver/src/stm32f10x_usart.o
- .debug_abbrev  0x00000530      0x174 src/ADC_Driver.o
- .debug_abbrev  0x000006a4      0x156 src/lcd.o
- .debug_abbrev  0x000007fa      0x2b6 src/main.o
- .debug_abbrev  0x00000ab0      0x268 src/serverApi.o
- .debug_abbrev  0x00000d18      0x2aa src/syscalls.o
- .debug_abbrev  0x00000fc2      0x19e src/system_stm32f10x.o
- .debug_abbrev  0x00001160      0x1cf src/timer.o
- .debug_abbrev  0x0000132f      0x23d src/uart.o
- .debug_abbrev  0x0000156c       0x12 startup/startup_stm32.o
+ .debug_abbrev  0x00000530      0x1ae src/ADC_Driver.o
+ .debug_abbrev  0x000006de      0x156 src/lcd.o
+ .debug_abbrev  0x00000834      0x2b6 src/main.o
+ .debug_abbrev  0x00000aea      0x268 src/serverApi.o
+ .debug_abbrev  0x00000d52      0x2aa src/syscalls.o
+ .debug_abbrev  0x00000ffc      0x19e src/system_stm32f10x.o
+ .debug_abbrev  0x0000119a      0x1cf src/timer.o
+ .debug_abbrev  0x00001369      0x23d src/uart.o
+ .debug_abbrev  0x000015a6       0x12 startup/startup_stm32.o
 
 .debug_aranges  0x00000000      0x840
  .debug_aranges
@@ -4857,7 +4858,7 @@ OUTPUT(IVEMA.elf elf32-littlearm)
  .debug_ranges  0x00000740       0x28 src/uart.o
  .debug_ranges  0x00000768       0x20 startup/startup_stm32.o
 
-.debug_macro    0x00000000     0x390c
+.debug_macro    0x00000000     0x3921
  .debug_macro   0x00000000      0x2a1 StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_macro   0x000002a1      0x3dc StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_macro   0x0000067d      0x1a1 StdPeriph_Driver/src/stm32f10x_tim.o
@@ -4869,75 +4870,76 @@ OUTPUT(IVEMA.elf elf32-littlearm)
  .debug_macro   0x00001533       0x82 src/ADC_Driver.o
  .debug_macro   0x000015b5      0x18a src/lcd.o
  .debug_macro   0x0000173f       0x10 src/lcd.o
- .debug_macro   0x0000174f      0x358 src/main.o
- .debug_macro   0x00001aa7       0x16 src/main.o
- .debug_macro   0x00001abd       0x5e src/main.o
- .debug_macro   0x00001b1b       0x18 src/main.o
- .debug_macro   0x00001b33       0x35 src/main.o
- .debug_macro   0x00001b68       0x34 src/main.o
- .debug_macro   0x00001b9c      0x174 src/main.o
- .debug_macro   0x00001d10       0x58 src/main.o
- .debug_macro   0x00001d68       0x1f src/main.o
- .debug_macro   0x00001d87       0x43 src/main.o
- .debug_macro   0x00001dca       0x20 src/main.o
- .debug_macro   0x00001dea      0x18e src/main.o
- .debug_macro   0x00001f78      0x330 src/main.o
- .debug_macro   0x000022a8       0x10 src/main.o
- .debug_macro   0x000022b8       0x35 src/main.o
- .debug_macro   0x000022ed       0x10 src/main.o
- .debug_macro   0x000022fd       0x22 src/main.o
- .debug_macro   0x0000231f       0x1c src/main.o
- .debug_macro   0x0000233b       0x10 src/main.o
- .debug_macro   0x0000234b       0x10 src/main.o
- .debug_macro   0x0000235b       0x1c src/main.o
- .debug_macro   0x00002377       0x52 src/main.o
- .debug_macro   0x000023c9       0x40 src/main.o
- .debug_macro   0x00002409       0x10 src/main.o
- .debug_macro   0x00002419       0x40 src/main.o
- .debug_macro   0x00002459       0xd7 src/main.o
- .debug_macro   0x00002530       0x1c src/main.o
- .debug_macro   0x0000254c       0x3d src/main.o
- .debug_macro   0x00002589       0x16 src/main.o
- .debug_macro   0x0000259f      0x16f src/main.o
- .debug_macro   0x0000270e      0x277 src/serverApi.o
- .debug_macro   0x00002985       0x10 src/serverApi.o
- .debug_macro   0x00002995      0x243 src/syscalls.o
- .debug_macro   0x00002bd8       0x58 src/syscalls.o
- .debug_macro   0x00002c30       0x94 src/syscalls.o
- .debug_macro   0x00002cc4       0x57 src/syscalls.o
- .debug_macro   0x00002d1b       0x10 src/syscalls.o
- .debug_macro   0x00002d2b       0x10 src/syscalls.o
- .debug_macro   0x00002d3b       0x10 src/syscalls.o
- .debug_macro   0x00002d4b       0x35 src/syscalls.o
- .debug_macro   0x00002d80      0x122 src/syscalls.o
- .debug_macro   0x00002ea2       0x16 src/syscalls.o
- .debug_macro   0x00002eb8       0x16 src/syscalls.o
- .debug_macro   0x00002ece       0x29 src/syscalls.o
- .debug_macro   0x00002ef7       0x10 src/syscalls.o
- .debug_macro   0x00002f07      0x241 src/syscalls.o
- .debug_macro   0x00003148       0x10 src/syscalls.o
- .debug_macro   0x00003158      0x189 src/syscalls.o
- .debug_macro   0x000032e1       0x16 src/syscalls.o
- .debug_macro   0x000032f7       0x88 src/syscalls.o
- .debug_macro   0x0000337f      0x188 src/system_stm32f10x.o
- .debug_macro   0x00003507      0x194 src/timer.o
- .debug_macro   0x0000369b      0x271 src/uart.o
+ .debug_macro   0x0000174f      0x35d src/main.o
+ .debug_macro   0x00001aac       0x16 src/main.o
+ .debug_macro   0x00001ac2       0x5e src/main.o
+ .debug_macro   0x00001b20       0x18 src/main.o
+ .debug_macro   0x00001b38       0x35 src/main.o
+ .debug_macro   0x00001b6d       0x34 src/main.o
+ .debug_macro   0x00001ba1      0x174 src/main.o
+ .debug_macro   0x00001d15       0x58 src/main.o
+ .debug_macro   0x00001d6d       0x1f src/main.o
+ .debug_macro   0x00001d8c       0x43 src/main.o
+ .debug_macro   0x00001dcf       0x20 src/main.o
+ .debug_macro   0x00001def      0x18e src/main.o
+ .debug_macro   0x00001f7d      0x330 src/main.o
+ .debug_macro   0x000022ad       0x10 src/main.o
+ .debug_macro   0x000022bd       0x35 src/main.o
+ .debug_macro   0x000022f2       0x10 src/main.o
+ .debug_macro   0x00002302       0x22 src/main.o
+ .debug_macro   0x00002324       0x1c src/main.o
+ .debug_macro   0x00002340       0x10 src/main.o
+ .debug_macro   0x00002350       0x10 src/main.o
+ .debug_macro   0x00002360       0x1c src/main.o
+ .debug_macro   0x0000237c       0x52 src/main.o
+ .debug_macro   0x000023ce       0x40 src/main.o
+ .debug_macro   0x0000240e       0x10 src/main.o
+ .debug_macro   0x0000241e       0x40 src/main.o
+ .debug_macro   0x0000245e       0xd7 src/main.o
+ .debug_macro   0x00002535       0x1c src/main.o
+ .debug_macro   0x00002551       0x3d src/main.o
+ .debug_macro   0x0000258e       0x16 src/main.o
+ .debug_macro   0x000025a4      0x16f src/main.o
+ .debug_macro   0x00002713       0x10 src/main.o
+ .debug_macro   0x00002723      0x277 src/serverApi.o
+ .debug_macro   0x0000299a       0x10 src/serverApi.o
+ .debug_macro   0x000029aa      0x243 src/syscalls.o
+ .debug_macro   0x00002bed       0x58 src/syscalls.o
+ .debug_macro   0x00002c45       0x94 src/syscalls.o
+ .debug_macro   0x00002cd9       0x57 src/syscalls.o
+ .debug_macro   0x00002d30       0x10 src/syscalls.o
+ .debug_macro   0x00002d40       0x10 src/syscalls.o
+ .debug_macro   0x00002d50       0x10 src/syscalls.o
+ .debug_macro   0x00002d60       0x35 src/syscalls.o
+ .debug_macro   0x00002d95      0x122 src/syscalls.o
+ .debug_macro   0x00002eb7       0x16 src/syscalls.o
+ .debug_macro   0x00002ecd       0x16 src/syscalls.o
+ .debug_macro   0x00002ee3       0x29 src/syscalls.o
+ .debug_macro   0x00002f0c       0x10 src/syscalls.o
+ .debug_macro   0x00002f1c      0x241 src/syscalls.o
+ .debug_macro   0x0000315d       0x10 src/syscalls.o
+ .debug_macro   0x0000316d      0x189 src/syscalls.o
+ .debug_macro   0x000032f6       0x16 src/syscalls.o
+ .debug_macro   0x0000330c       0x88 src/syscalls.o
+ .debug_macro   0x00003394      0x188 src/system_stm32f10x.o
+ .debug_macro   0x0000351c      0x194 src/timer.o
+ .debug_macro   0x000036b0      0x271 src/uart.o
 
-.debug_line     0x00000000     0x54b6
+.debug_line     0x00000000     0x54bd
  .debug_line    0x00000000      0x83c StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_line    0x0000083c      0xec1 StdPeriph_Driver/src/stm32f10x_tim.o
  .debug_line    0x000016fd      0x80e StdPeriph_Driver/src/stm32f10x_usart.o
- .debug_line    0x00001f0b      0x693 src/ADC_Driver.o
- .debug_line    0x0000259e      0x663 src/lcd.o
- .debug_line    0x00002c01      0x867 src/main.o
- .debug_line    0x00003468      0x730 src/serverApi.o
- .debug_line    0x00003b98      0x5df src/syscalls.o
- .debug_line    0x00004177      0x5f5 src/system_stm32f10x.o
- .debug_line    0x0000476c      0x639 src/timer.o
- .debug_line    0x00004da5      0x695 src/uart.o
- .debug_line    0x0000543a       0x7c startup/startup_stm32.o
+ .debug_line    0x00001f0b      0x694 src/ADC_Driver.o
+ .debug_line    0x0000259f      0x663 src/lcd.o
+ .debug_line    0x00002c02      0x86d src/main.o
+ .debug_line    0x0000346f      0x730 src/serverApi.o
+ .debug_line    0x00003b9f      0x5df src/syscalls.o
+ .debug_line    0x0000417e      0x5f5 src/system_stm32f10x.o
+ .debug_line    0x00004773      0x639 src/timer.o
+ .debug_line    0x00004dac      0x695 src/uart.o
+ .debug_line    0x00005441       0x7c startup/startup_stm32.o
 
-.debug_str      0x00000000    0x54f22
+.debug_str      0x00000000    0x54f6a
  .debug_str     0x00000000    0x4dbdb StdPeriph_Driver/src/stm32f10x_rcc.o
                               0x4dd8a (size before relaxing)
  .debug_str     0x0004dbdb      0xc4c StdPeriph_Driver/src/stm32f10x_tim.o
@@ -4948,19 +4950,19 @@ OUTPUT(IVEMA.elf elf32-littlearm)
                               0x4d580 (size before relaxing)
  .debug_str     0x0004f39b      0x107 src/lcd.o
                               0x4d41f (size before relaxing)
- .debug_str     0x0004f4a2     0x423e src/main.o
-                              0x518d4 (size before relaxing)
- .debug_str     0x000536e0      0x161 src/serverApi.o
+ .debug_str     0x0004f4a2     0x4286 src/main.o
+                              0x5191c (size before relaxing)
+ .debug_str     0x00053728      0x161 src/serverApi.o
                               0x503d3 (size before relaxing)
- .debug_str     0x00053841     0x11f5 src/syscalls.o
+ .debug_str     0x00053889     0x11f5 src/syscalls.o
                                0x8569 (size before relaxing)
- .debug_str     0x00054a36       0xd4 src/system_stm32f10x.o
+ .debug_str     0x00054a7e       0xd4 src/system_stm32f10x.o
                               0x4d338 (size before relaxing)
- .debug_str     0x00054b0a      0x381 src/timer.o
+ .debug_str     0x00054b52      0x381 src/timer.o
                               0x4d71e (size before relaxing)
- .debug_str     0x00054e8b       0x6e src/uart.o
+ .debug_str     0x00054ed3       0x6e src/uart.o
                               0x50401 (size before relaxing)
- .debug_str     0x00054ef9       0x29 startup/startup_stm32.o
+ .debug_str     0x00054f41       0x29 startup/startup_stm32.o
                                  0x4e (size before relaxing)
 
 .comment        0x00000000       0x7f
