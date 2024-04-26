@@ -38,7 +38,6 @@ int main(void)
 	/* Initialize DMA for 3 ADC conversions transfer */
 	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
 
-
 	/** End of System Initialization **/
 
 	/** 2. Display Peripheral Init **/
@@ -85,18 +84,22 @@ int main(void)
 
 		/** 7. Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
 
+#if CFG_PROCESSING_RAW_VALUES
+		ProcessRawSensorData();
+#endif
+
 		/** End of Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
 
 		/** 8. Display average PPM and temperature values on LCD **/
 
 		clearLcd();
 
-		sprintf(mq135DataStr, "%lu", avgAdcVal_mq135);
+		sprintf(mq135DataStr, "%.1f", CO2ppm);
 		lcdCursorSet(0,0);
 		lcd_send_string("  MQ135 ");
 		lcd_send_string(mq135DataStr);
 
-		sprintf(mq7DataStr, "%lu", avgAdcVal_mq7);
+		sprintf(mq7DataStr, "%.1f", COppm);
 		lcdCursorSet(1,0);
 		lcd_send_string("MQ7 ");
 		lcd_send_string(mq7DataStr);
@@ -111,7 +114,7 @@ int main(void)
 		/** 9. If sensor readings crosses the critical threshold limits **/
 
 #if CFG_ENABLE_CRITICAL_THRESHOLD_CHECKS
-		if( (avgAdcVal_mq135 > mq135_critical_threshold_limit) || (avgAdcVal_mq7 > mq7_critical_threshold_limit) )
+		if( (CO2ppm > mq135_critical_threshold_limit) || (COppm > mq7_critical_threshold_limit) )
 #endif
 		{
 		/** End of if sensor readings crosses the critical threshold limits **/
@@ -332,6 +335,18 @@ void Get_AverageAdcVal()
 	avgAdcVal_mq7 /= MAX_NO_OF_SAMPLES;
 	avgTemperatureValue /= MAX_NO_OF_SAMPLES;
 }
+
+#if CFG_PROCESSING_RAW_VALUES
+/*********************************************
+ * ProcessRawSensorData
+ * Processing of Raw ADC Sensor Data into PPM
+ ********************************************/
+void ProcessRawSensorData()
+{
+	CO2ppm = map((avgAdcVal_mq135-mq135_zero),0,4095,400,5000);
+	COppm = map((avgAdcVal_mq7-mq7_zero),0,4095,0,50);
+}
+#endif
 
 /*********************************************
  * ToggleLed
