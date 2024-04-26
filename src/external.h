@@ -11,6 +11,10 @@
 /**
  * External variables and functions
  */
+
+extern char tempDataStr[8];
+extern char mq135DataStr[8];
+extern char mq7DataStr[8];
 extern uint8_t sysTimeout;
 extern void delay_in_sec(unsigned int);
 extern void delay_in_ms(unsigned int);

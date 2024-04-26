@@ -20,15 +20,9 @@
 /**
  * Typedef and Macro Definitions
  */
-#define 	SIM900_RESPONSE_SIZE		200
-#define		SERVER_RESPONSE_SIZE		1700
-#define		RESPONSECODE_SIZE			4
-#define		JWT_TOKEN_SIZE				450
-
-#define 	LAT_SIZE					11
-#define 	LON_SIZE					12
-
-#define 	DIST_SIZE					10
+#define 	SIM900_RESPONSE_SIZE		100
+//#define		SERVER_RESPONSE_SIZE		1700
+#define		RESPONSECODE_SIZE			10
 
 typedef enum{Fail,Success} sysResponse;
 
@@ -36,7 +30,7 @@ typedef enum{Fail,Success} sysResponse;
  * User-defined Variables
  */
 char sim900Response[SIM900_RESPONSE_SIZE];	/* To store the SIM900 module response */
-char serverResponse[SERVER_RESPONSE_SIZE];	/* To store the server response */
+//char serverResponse[SERVER_RESPONSE_SIZE];	/* To store the server response */
 char responseCode[RESPONSECODE_SIZE];		/* To store the server response code */
 
 /**
@@ -49,7 +43,6 @@ void saveKey_Val(int*,char*,int,int*,char*,int);
 
 /* GPRS related functions Declarations */
 int startGprs(void);
-void extractServerResponse(int,char);		/* Method to receive server response till '}' n number of times */
 void resetBuffer(char*,int);				/* Method to reset buffer with NULL characters */
 
 /* APIs Declarations */

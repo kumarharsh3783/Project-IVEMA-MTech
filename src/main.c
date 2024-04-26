@@ -13,39 +13,41 @@
 
 /**
  * Brief:	Hardware Connection Details
- * 			USART2[sim900a]
+ * 			USART1[sim900a]
  * --------------------------------------
- * 	TX:		PA2
- * 	RX:		PA3
+ * 	TX:		PA9
+ * 	RX:		PA10
  * 	-------------------------------------
  */
 int main(void)
 {
-	/** 1. System Initialisation **/
+	/** 1. System Initialization **/
 
 	/* System Clock Frequency : 56 MHz */
 	systemClockInit(sysclk_56MHz);
 	/* All the GPIOs required for the project is initialized here */
 	gpioInit();
-	/* Initialise TIM4 */
-	timerInit();
-	/* Initialise ADC1 Module */
-	adcInit();
-	/* Initialise DMA for 3 ADC conversions transfer */
-	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
-	/* Initialise USART1: RFID and USART2: GPRS/GPS */
+	/* Initialize USART1: GPRS/GPS */
 	uartInit();
-	/* Enable USART2 - SIM900a */
-	USART_Cmd(USART2, ENABLE);
+	/* Enable USART1 - SIM900a */
+	USART_Cmd(USART1, ENABLE);
+	/* Initialize TIM4 */
+	timerInit();
+	/* Initialize ADC1 Module */
+	adcInit();
+	/* Initialize DMA for 3 ADC conversions transfer */
+	dmaInit((uint32_t *)&ADC1->DR, (uint32_t *)dmaRcvBuf, 3u);
 
-	/** End of System Initialisation **/
+	/** End of System Initialization **/
 
 	/** 2. Display Peripheral Init **/
 
-	/* Initialise 16*2 LCD */
+	/* Initialize 16*2 LCD */
 	lcdInit();
 
 	/** End of Display Peripheral Init **/
+
+	PowerOffLed();
 
 	/** 3. Display Message on LCD "Gas Sensors Warming Up" **/
 
@@ -58,7 +60,7 @@ int main(void)
 
 	/** 4. Wait for 90 seconds for gas sensor warming up **/
 
-	delay_in_sec(90);
+	delay_in_sec(10);
 
 	/** End of Wait for 90 seconds for gas sensor warming up **/
 
@@ -66,12 +68,13 @@ int main(void)
 
 	/* Start the ADC Conversion */
 	adc1StartConversion();
+	/* Dummy Read of Sensors once for Calibration */
+	Get_AverageAdcVal();
 
-	/* infinite loop */
+	/** End of Read ADC values for the Sensors **/
+
 	while(1)
 	{
-		/* LED LD2 Toggle */
-		GPIOA->ODR ^= GPIO_ODR_ODR5;
 
 		/** 6. Calculate Average value for last 10 samples for each sensor **/
 
@@ -79,28 +82,59 @@ int main(void)
 
 		/** End of Calculate Average value for last 10 samples for each sensor **/
 
+		/** 7. Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
+
+#if CFG_PROCESSING_RAW_VALUES
+		ProcessRawSensorData();
+#endif
+
+		/** End of Process Raw ADC Values to find PPM concentrations of exhaust particulate matter **/
+
 		/** 8. Display average PPM and temperature values on LCD **/
 
 		clearLcd();
 
-		sprintf(sensorDataStr, "%lu", avgAdcVal_mq135);
+		sprintf(mq135DataStr, "%.1f", CO2ppm);
 		lcdCursorSet(0,0);
 		lcd_send_string("  MQ135 ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(mq135DataStr);
 
-		sprintf(sensorDataStr, "%lu", avgAdcVal_mq7);
+		sprintf(mq7DataStr, "%.1f", COppm);
 		lcdCursorSet(1,0);
 		lcd_send_string("MQ7 ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(mq7DataStr);
 
-		sprintf(sensorDataStr, "%.2f", avgTemperatureValue);
+		sprintf(tempDataStr, "%.2f", avgTemperatureValue);
 		lcdCursorSet(1,9);
 		lcd_send_string("T ");
-		lcd_send_string(sensorDataStr);
+		lcd_send_string(tempDataStr);
 
 		/** End of Display average PPM and temperature values **/
 
-		delay_in_sec(10);
+		/** 9. If sensor readings crosses the critical threshold limits **/
+
+#if CFG_ENABLE_CRITICAL_THRESHOLD_CHECKS
+		if( (CO2ppm > mq135_critical_threshold_limit) || (COppm > mq7_critical_threshold_limit) )
+#endif
+		{
+		/** End of if sensor readings crosses the critical threshold limits **/
+
+#if CFG_ENABLE_GPRS_DATA_TO_SERVER
+
+		/** 10. If Wireless Connection successful, send sensor data to server !! **/
+
+			PowerOnLed();
+			sendData_toServer();
+			PowerOffLed();
+
+		/** End of if Wireless Connection successful, send sensor data to server !! **/
+#endif
+		}
+		/** 11. Timer Interval of 15 minutes **/
+
+		delay_in_sec(5);
+
+		/** End of Timer Interval of 15 minutes **/
 	}
 }
 
@@ -195,14 +229,15 @@ void gpioInit()
 	/* Clock to GPIO Peripherals - Port A, B, C */
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN;	/* Enable clock to GPIO Port A for UARTs and GPIO B LCD*/
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;							/* Enable clock to GPIO Port C for LED indicator */
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;							/* Alternate Function IO clock enabled */
+	//RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;							/* Alternate Function IO clock enabled */
 
 	/*<--------------USART Clock/GPIO Configuration------------->*/
+
+	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				 // TX pin PA9 configured as output @50MHz in alternate function push pull
+	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							 // RX pin PA10 configured as input in floating input mode
 /*
-	GPIOA->CRH |= GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9;				 TX pin PA9 configured as output @50MHz in alternate function push pull
-	GPIOA->CRH &= ~(GPIO_CRH_CNF9_0);							 RX pin PA10 configured as input in floating input mode
-	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				 TX pin PA2 configured as output @50MHz in alternate function push pull
-	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							 RX pin PA3 configured as input in floating input mode
+	GPIOA->CRL |= GPIO_CRL_CNF2_1 | GPIO_CRL_MODE2;				 // TX pin PA2 configured as output @50MHz in alternate function push pull
+	GPIOA->CRL &= ~(GPIO_CRL_CNF2_0);							 // RX pin PA3 configured as input in floating input mode
 */
 
 	/*<------------------LCD GPIO Configuration----------------->*/
@@ -235,7 +270,7 @@ void gpioInit()
 }
 
 /**
- * Brief : DMA Initialisation API
+ * Brief : DMA Initialization API
  * Param : (uint32_t *) src : Source Address
  * 		(uint32_t *) dst : Destination Address
  * 		(unsigned int) len : Number of Data to transfer via DMA
@@ -299,4 +334,46 @@ void Get_AverageAdcVal()
 	avgAdcVal_mq135 /= MAX_NO_OF_SAMPLES;
 	avgAdcVal_mq7 /= MAX_NO_OF_SAMPLES;
 	avgTemperatureValue /= MAX_NO_OF_SAMPLES;
+}
+
+#if CFG_PROCESSING_RAW_VALUES
+/*********************************************
+ * ProcessRawSensorData
+ * Processing of Raw ADC Sensor Data into PPM
+ ********************************************/
+void ProcessRawSensorData()
+{
+	CO2ppm = map((avgAdcVal_mq135-mq135_zero),0,4095,400,5000);
+	COppm = map((avgAdcVal_mq7-mq7_zero),0,4095,0,50);
+}
+#endif
+
+/*********************************************
+ * ToggleLed
+ * Toggle the current state of the LED LD2
+ ********************************************/
+void ToggleLed()
+{
+	/* LED LD2 Toggle */
+	GPIOA->ODR ^= GPIO_ODR_ODR5;
+}
+
+/*********************************************
+ * PowerOnLed
+ * Switch ON the LED LD2
+ ********************************************/
+void PowerOnLed()
+{
+	/* LED LD2 ON */
+	GPIOA->ODR |= GPIO_ODR_ODR5;
+}
+
+/*********************************************
+ * PowerOffLed
+ * Switch OFF the LED LD2
+ ********************************************/
+void PowerOffLed()
+{
+	/* LED LD2 OFF */
+	GPIOA->ODR &= ~GPIO_ODR_ODR5;
 }

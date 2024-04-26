@@ -37,7 +37,7 @@ void timerInit()
 	TIM2->CR1 |= TIM_CR1_URS;
 	/* Update interrupt enabled */
 	TIM2->DIER |= TIM_DIER_UIE;
-	/* Re-initialise the counter and generates an update of the registers */
+	/* Re-initialize the counter and generates an update of the registers */
 	TIM2->EGR |= TIM_EGR_UG;
 	/* Enable Timer Interrupt Request in NVIC */
 	NVIC_EnableIRQ(TIM2_IRQn);
