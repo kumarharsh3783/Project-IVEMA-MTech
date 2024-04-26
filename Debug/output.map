@@ -123,7 +123,6 @@ mq135DataStr        0x8               src/main.o
 CO2ppm              0x4               src/main.o
 lcdData             0x2               src/lcd.o
 sim900Response      0x64              src/main.o
-gpsFixStatus        0x1               src/serverApi.o
 lcdIndex            0x4               src/lcd.o
 adcVal_mq135        0x2               src/main.o
 adcVal_mq7          0x2               src/main.o
@@ -4653,10 +4652,9 @@ LOAD c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17
                 0x20000b68                adcVal_mq135
                 0x20000b6a                adcVal_mq7
                 0x20000b6c                mq7DataStr
- COMMON         0x20000b74        0x2 src/serverApi.o
-                0x20000b74                gpsFixStatus
-                0x20000b75                status
- *fill*         0x20000b76        0x2 
+ COMMON         0x20000b74        0x1 src/serverApi.o
+                0x20000b74                status
+ *fill*         0x20000b75        0x3 
  COMMON         0x20000b78        0x4 src/timer.o
                 0x20000b78                DELAY_mSECS
  COMMON         0x20000b7c       0x21 c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/compiler/bin/../lib/gcc/arm-none-eabi/7.3.1/../../../../arm-none-eabi/lib/thumb/v7-m\libc.a(lib_a-lock.o)
@@ -4821,19 +4819,19 @@ LOAD c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17
                 0x00000a0b       0x1d c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/compiler/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7-m/crtn.o
 OUTPUT(IVEMA.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x7f56
+.debug_info     0x00000000     0x7f45
  .debug_info    0x00000000      0x89c StdPeriph_Driver/src/stm32f10x_rcc.o
  .debug_info    0x0000089c     0x1c54 StdPeriph_Driver/src/stm32f10x_tim.o
  .debug_info    0x000024f0      0x9e4 StdPeriph_Driver/src/stm32f10x_usart.o
  .debug_info    0x00002ed4      0x45f src/ADC_Driver.o
  .debug_info    0x00003333      0x5d0 src/lcd.o
  .debug_info    0x00003903     0x1006 src/main.o
- .debug_info    0x00004909      0xd29 src/serverApi.o
- .debug_info    0x00005632      0xf2e src/syscalls.o
- .debug_info    0x00006560      0x450 src/system_stm32f10x.o
- .debug_info    0x000069b0      0x740 src/timer.o
- .debug_info    0x000070f0      0xe44 src/uart.o
- .debug_info    0x00007f34       0x22 startup/startup_stm32.o
+ .debug_info    0x00004909      0xd18 src/serverApi.o
+ .debug_info    0x00005621      0xf2e src/syscalls.o
+ .debug_info    0x0000654f      0x450 src/system_stm32f10x.o
+ .debug_info    0x0000699f      0x740 src/timer.o
+ .debug_info    0x000070df      0xe44 src/uart.o
+ .debug_info    0x00007f23       0x22 startup/startup_stm32.o
 
 .debug_abbrev   0x00000000     0x15d0
  .debug_abbrev  0x00000000      0x1d4 StdPeriph_Driver/src/stm32f10x_rcc.o
@@ -4970,7 +4968,7 @@ OUTPUT(IVEMA.elf elf32-littlearm)
  .debug_line    0x00004d7c      0x695 src/uart.o
  .debug_line    0x00005411       0x7c startup/startup_stm32.o
 
-.debug_str      0x00000000    0x55016
+.debug_str      0x00000000    0x55009
  .debug_str     0x00000000    0x4dbdb StdPeriph_Driver/src/stm32f10x_rcc.o
                               0x4dd8a (size before relaxing)
  .debug_str     0x0004dbdb      0xc4c StdPeriph_Driver/src/stm32f10x_tim.o
@@ -4983,17 +4981,17 @@ OUTPUT(IVEMA.elf elf32-littlearm)
                               0x4d41f (size before relaxing)
  .debug_str     0x0004f4a2     0x4332 src/main.o
                               0x519c8 (size before relaxing)
- .debug_str     0x000537d4      0x161 src/serverApi.o
-                              0x503d3 (size before relaxing)
- .debug_str     0x00053935     0x11f5 src/syscalls.o
+ .debug_str     0x000537d4      0x154 src/serverApi.o
+                              0x503c6 (size before relaxing)
+ .debug_str     0x00053928     0x11f5 src/syscalls.o
                                0x8569 (size before relaxing)
- .debug_str     0x00054b2a       0xd4 src/system_stm32f10x.o
+ .debug_str     0x00054b1d       0xd4 src/system_stm32f10x.o
                               0x4d338 (size before relaxing)
- .debug_str     0x00054bfe      0x381 src/timer.o
+ .debug_str     0x00054bf1      0x381 src/timer.o
                               0x4d71e (size before relaxing)
- .debug_str     0x00054f7f       0x6e src/uart.o
+ .debug_str     0x00054f72       0x6e src/uart.o
                               0x50401 (size before relaxing)
- .debug_str     0x00054fed       0x29 startup/startup_stm32.o
+ .debug_str     0x00054fe0       0x29 startup/startup_stm32.o
                                  0x4e (size before relaxing)
 
 .comment        0x00000000       0x7f
