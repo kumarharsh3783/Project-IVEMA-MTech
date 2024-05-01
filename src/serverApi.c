@@ -10,7 +10,7 @@
 
 /*Private User-defined variables start*/
 
-sysResponse status, gpsFixStatus;
+sysResponse status;
 
 /* Default Domain Name of the server */
 char domainName[30] = "api.thingspeak.com";
