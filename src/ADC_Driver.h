@@ -44,7 +44,7 @@
 #define 	AVG_SLOPE			0.0043
 #define 	VSENSE				(3.3/4095)
 
-#define 	MAX_NO_OF_SAMPLES	10
+#define 	MAX_NO_OF_SAMPLES	100
 
 /*********************************************************************
  * Variable Declarations
