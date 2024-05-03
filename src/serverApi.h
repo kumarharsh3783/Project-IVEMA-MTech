@@ -16,6 +16,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "external.h"
+#include "error.h"
 
 /**
  * Typedef and Macro Definitions
