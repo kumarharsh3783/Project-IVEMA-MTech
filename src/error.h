@@ -12,6 +12,12 @@
  * Include Files
  */
 #include "lcd.h"
+#include "timer.h"
 
+/**
+ * Function Declarations
+ */
+void errorMsg(void);
+void errorMsg1(void);
 
 #endif /* ERROR_H_ */

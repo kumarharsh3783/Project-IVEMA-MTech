@@ -218,6 +218,7 @@ int sendData_toServer()
 	if(systemResponseCheck(sim900Response,"OK") == Fail)	/* Check if OK is received */
 	{
 		/*Generate an ErrorCode for Error Handler to display appropriate message in LCD*/
+		errorMsg1();
 		return 0;
 	}
 
@@ -225,6 +226,7 @@ int sendData_toServer()
 
 	if(!startGprs())											/* Connect to the server */
 	{
+		errorMsg();
 		return 0;												/* Try again */
 	}
 	/* API Header */
@@ -251,6 +253,7 @@ int sendData_toServer()
 	if(systemResponseCheck(responseCode,"D") == Fail)
 	{
 		/*Generate an ErrorCode for Error Handler to display appropriate message in LCD*/
+		errorMsg();
 		return 0;
 	}
 

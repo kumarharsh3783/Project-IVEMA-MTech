@@ -65,6 +65,13 @@ int main(void)
 	/** End of Wait for 90 seconds for gas sensor warming up **/
 
 	/** 5. Read ADC values for the Sensors **/
+#if CFG_ADDITIONAL_USER_DISPLAY_MSG
+	lcdCursorSet(0,0);
+	lcd_send_string("Calibration of  ");
+	lcdCursorSet(1,0);					/* Change cursor to line 1 */
+	lcd_send_string("ADCs Ongoing... ");
+	delay_in_ms(2000);
+#endif
 
 	/* Start the ADC Conversion */
 	adc1StartConversion();
@@ -118,6 +125,14 @@ int main(void)
 #endif
 		{
 		/** End of if sensor readings crosses the critical threshold limits **/
+
+#if CFG_ADDITIONAL_USER_DISPLAY_MSG
+			delay_in_ms(3000);
+			lcdCursorSet(0,0);
+			lcd_send_string("Over-emission!! ");
+			lcdCursorSet(1,0);					/* Change cursor to line 1 */
+			lcd_send_string("Data uploading..");
+#endif
 
 #if CFG_ENABLE_GPRS_DATA_TO_SERVER
 
