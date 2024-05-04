@@ -209,9 +209,11 @@ int startGprs()
  */
 int sendData_toServer()
 {
-	/**** Activate the GPRS Module Once at the time of driver authentication ****/
+	/**** Activate the GPRS Module Once Just after Echo Off ****/
 
 	uartSendData("ATE0\r\n");			/* Initiate echo OFF SIM900 */
+	uartReceiveData(sim900Response,2);	/* Receive sim900 module response at sim900Response string */
+	uartSendData("AT\r\n");				/* Initiate AT commands for SIM900 */
 	uartReceiveData(sim900Response,2);	/* Receive sim900 module response at sim900Response string */
 	uartSendData("AT\r\n");				/* Initiate AT commands for SIM900 */
 	uartReceiveData(sim900Response,2);	/* Receive sim900 module response at sim900Response string */
@@ -257,7 +259,7 @@ int sendData_toServer()
 		return 0;
 	}
 
-	delay_in_ms(2000);
+	delay_in_ms(1000);
 
 	/* Close the connection */
 	uartSendData("AT+CIPSHUT\r\n");
